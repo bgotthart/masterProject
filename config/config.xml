@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<root>
+    <baseURL>http://localhost/IM/masterthesis</baseURL>
+    <fileBaseURL>file:///Applications/XAMPP/xamppfiles/htdocs/IM/masterThesis</fileBaseURL>
+     <database>
+        <db_host>localhost</db_host>
+        <db_name>masterproject</db_name>
+        <db_user>root</db_user>
+        <db_pwd>root</db_pwd>
+        <store_name></store_name>
+    </database>
+    <apis>
+        <opencalais>
+            <apikey>48zftr79f5tqsefjm7hppr2e</apikey>
+            <url>http://service.semanticproxy.com/processurl/</url>
+        </opencalais>
+        <zemanta>
+            <apikey>vfxlhrdsbmz3tnh77g3hx0gp</apikey>
+        </zemanta>
+         <alchemy>
+            <apikey>f069682a820c7f47e9d5c1daf863975f39c5ee5b</apikey>
+        </alchemy>
+    </apis>
+    <newsfeeds>
+        <feed>
+            <filename>http://feeds.feedburner.com/TechCrunch/</filename>
+        </feed>
+        <feed>
+            <filename>http://feeds.bbci.co.uk/news/rss.xml?edition=int</filename>
+        </feed>
+        <feed>
+            <filename>https://news.google.com/news/feeds?ned=us&amp;topic=h&amp;output=rss</filename>
+        </feed>
+    </newsfeeds>
+   
+</root>

@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99c (Web2C 7.5.7)
+The top-level auxiliary file: SurveyPaper.aux
+The style file: abbrv.bst
+Database file #1: SurveyPaper.bib
+Warning--to sort, need author or key in _open_2013
+Warning--empty publisher in chan_non-invasive_1999
+Warning--empty booktitle in min_building_2011
+You've used 17 entries,
+            2118 wiz_defined-function locations,
+            598 strings with 6751 characters,
+and the built_in function-call counts, 6229 in all, are:
+= -- 642
+> -- 264
+< -- 6
++ -- 108
+- -- 88
+* -- 344
+:= -- 932
+add.period$ -- 56
+call.type$ -- 17
+change.case$ -- 94
+chr.to.int$ -- 0
+cite$ -- 20
+duplicate$ -- 298
+empty$ -- 483
+format.name$ -- 88
+if$ -- 1417
+int.to.chr$ -- 0
+int.to.str$ -- 17
+missing$ -- 12
+newline$ -- 87
+num.names$ -- 32
+pop$ -- 130
+preamble$ -- 1
+purify$ -- 78
+quote$ -- 0
+skip$ -- 278
+stack$ -- 0
+substring$ -- 275
+swap$ -- 131
+text.length$ -- 6
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 66
+warning$ -- 3
+while$ -- 42
+width$ -- 19
+write$ -- 195
+(There were 3 warnings)

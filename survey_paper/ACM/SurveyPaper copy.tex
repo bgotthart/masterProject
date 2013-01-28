@@ -1,0 +1,179 @@
+% THIS IS SIGPROC-SP.TEX - VERSION 3.1
+% WORKS WITH V3.2SP OF ACM_PROC_ARTICLE-SP.CLS
+% APRIL 2009
+%
+% It is an example file showing how to use the 'acm_proc_article-sp.cls' V3.2SP
+% LaTeX2e document class file for Conference Proceedings submissions.
+% ----------------------------------------------------------------------------------------------------------------
+% This .tex file (and associated .cls V3.2SP) *DOES NOT* produce:
+%       1) The Permission Statement
+%       2) The Conference (location) Info information
+%       3) The Copyright Line with ACM data
+%       4) Page numbering
+% ---------------------------------------------------------------------------------------------------------------
+% It is an example which *does* use the .bib file (from which the .bbl file
+% is produced).
+% REMEMBER HOWEVER: After having produced the .bbl file,
+% and prior to final submission,
+% you need to 'insert'  your .bbl file into your source .tex file so as to provide
+% ONE 'self-contained' source file.
+%
+% Questions regarding SIGS should be sent to
+% Adrienne Griscti ---> griscti@acm.org
+%
+% Questions/suggestions regarding the guidelines, .tex and .cls files, etc. to
+% Gerald Murray ---> murray@hq.acm.org
+%
+% For tracking purposes - this is V3.1SP - APRIL 2009
+
+\documentclass{acm_proc_article-sp}
+
+\begin{document}
+
+\title{Ontologien zur Speicherung und Verwaltung von User Profilen}
+\subtitle{Survey Paper}
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{1} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor
+Bianca Gotthart\\
+       \affaddr{Fachhochschule Hagenberg}\\
+       \affaddr{Softwarepark 11}\\
+       \affaddr{4232 Hagenberg, Österreich}\\
+       \email{bianca.gotthart@fh-hagenberg.at}
+}
+\date{15 Jänner 2013}
+% Just remember to make sure that the TOTAL number of authors
+% is the number that will appear on the first page PLUS the
+% number that will appear in the \additionalauthors section.
+\maketitle
+\begin{abstract}
+\end{abstract}
+
+% A category with the (minimum) three required fields
+\category{H.4}{Information Systems Applications}{Miscellaneous}
+%A category including the fourth, optional field follows...
+\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+
+\terms{Theory}
+
+\keywords{ACM proceedings, \LaTeX, text tagging} % NOT required for Proceedings
+
+\section{Introduction}
+Das Herausfinden von Benutzerinteressen ist ein wichtiges Thema im Bereich von Personalisierung im Web. 
+
+\section{Sammeln von Benutzerdaten}
+
+\section{Speicherung von Benutzerdaten}
+
+\section{Sammlung von Daten}
+
+Bei \cite{srinvas_explicit_2012} 
+In der Web Domain, die Erstellung von Benutzerprofile bedeutet das Sammeln von Informationen über einen Benutzer, mit dem Ziel, neben demographischen Informationen, auch Interessen und dessen Verhalten zu sammeln und analysieren während des Surfens. Das Ziel dieses Vorgangs ist, die Bedürfnisse des Benutzers zu erkennen und Suchvorgänge oder die Struktur von Webseiten für den Benutzer individuell auf diese anzupassen. Dies Sammlung von Informationen kann entweder implizt oder explizit geschehen. 
+
+Bei der expliziten Benutzermodellierung wird der Benutzer gebeten, selbst Interessen zu definieren, indem Interessen vorgegeben werden oder diese mit Hilfe von Bewertung mitgeteilt werden, wie zum Beispiel bei einem Artikel auf einer Website angeben, dass dieser den Interessen widerspiegelt. Ein System kann somit dies speichern und auswerten, um zum Beispiel bei Suchanfragen die Ergebnisse dahingegen zu filtern. 
+Die Nachteile bei der expliziten Angabe von Interessen ist allerdings die Zeitkomponente. Interessen können sich sehr schnell ändern und ein Profil ständig anzupassen, würde für den Benutzer Aufwand und Konzequenz verlangen. 
+Im Gegensatz zur der impliziten Benutzermodellierung werden die Interessen mit diversen Algorithmen automatisch ermittelt, wobei der Benutzer kaum bis keinen Aufwand hat. Die Daten werden während des Surfens gesammelt, indem von den Seiten, die der Benutzer betrachtet, Informationen gespeichert werden.
+
+
+
+Bei \cite{srinvas_explicit_2012} werden Ontologien verwendet, um Themen zu identifizieren, die den Benutzer interessieren könnten, um darauf aufbauend ein Benutzerprofil zu erstellen. Diese wird als hierarchische Struktur aufgebaut, worin die Themen die Klassifikation und Kategorisierung von Webseiten.
+
+\subsection{Semantic Web}
+Semantic Web spielt für die Sammlung von kontext relevanten Themen eine besondere Rolle, da hiermit ermöglicht wird, den Fokus nicht nur auf einzelnen Begriffe, sondern vielmehr auch die Beziehung und den Kontext zu erfassen. 
+
+
+
+\section{User Profiling for Interest-focused Browsing History}
+
+\cite{kim_learning_2003} erstellen Benutzerprofile als hierarchische Baunstruktur, worin die Interessen gespeichert werden. Als Hauptzeige werden die allgemeinen Interessen oder langfristigen und die Unterknoten als spezifische oder kurzfristigen Interessensbegriffe bezeichnet. Als Daten werden Websseiten genommen und in diese Hierarchie geclustert gespeichert. Als Daten werden die Wörter auf der Webseite hergenommen und analysiert.  
+
+Durch das Modellieren von Benutzerprofilen bietet eine wichtige Quelle von Metadaten über den Benutzer, um diesen besser zu verstehen, indem die Daten eine Semantik zugetragen weren kann. Somit ist das Hauptziel von Benutzermodellierung diesem personalisierte Informationen anzubieten. Das von \cite{grcar_user} entwickelte System erstellt ein dynamisches Benutzerprofil basierend auf einer Themen-Ontologie. 
+
+
+\section{A User Profile Modelling Using Social Annotations}
+Im Bereich vos Social Webs spielen Benutzerprofile eine wichtige Rolle. Dabei sind soziale Aktivitäten wie geteilte Informationen oder Kommunkation mit speziellen anderen Benutzern wichtig zu identifizieren. Zum einen gibt es hierfür statische Daten, wie zum Beispiel Alter, Name, etc. oder auch dynamische Daten, die sich immer wieder ändern. 
+
+User Profile Daten:
+(1) Basis Informationen: demografische Daten
+(2) Wissen über den Benutzer, das von der Navigation über Webseiten extrahiert werden kann
+(3) Interessen des Benutzers, die von Schlüsselwörter oder Beziehungen definiert werden können
+
+\section{Building User Interest Profiles from Wikipedia Clusters}
+In dieser Arbeit wird eine Methode beschrieben, die als Basis die historischen Suchdaten verwenden, um ein Benutzerprofil aufzubauen. Dabei wird als externe Wissensdatenbank Wikipedia verwendet. 
+
+
+
+\section{Conclusions}
+
+
+%\end{document}  % This is where a 'short' article might terminate
+
+%ACKNOWLEDGMENTS are optional
+\section{Acknowledgments}
+This section is optional; it is a location for you
+to acknowledge grants, funding, editing assistance and
+what have you.  In the present case, for example, the
+authors would like to thank Gerald Murray of ACM for
+his help in codifying this \textit{Author's Guide}
+and the \textbf{.cls} and \textbf{.tex} files that it describes.
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{library}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+%
+% ACM needs 'a single self-contained file'!
+%
+%APPENDICES are optional
+%\balancecolumns
+\appendix
+%Appendix A
+\section{Headings in Appendices}
+\balancecolumns
+% That's all folks!
+\end{document}

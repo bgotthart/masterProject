@@ -1,0 +1,474 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.semanticweb.org/ontologies/2013/0/ex.owl#"
+     xml:base="http://www.semanticweb.org/ontologies/2013/0/ex.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#belongsToURI -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#belongsToURI"/>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#entityHasKeywords -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#entityHasKeywords">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasEntities"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#entityHasTopic -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#entityHasTopic">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasEntity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#isAbout -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#isAbout">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#belongsToURI"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasEntities -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasEntities">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasRessource -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasRessource">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasTopic -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasTopic">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasKeyword"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordIsInterestedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordIsInterestedBy">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceHasKeyword -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceHasKeyword">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasRessource"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceIsAboutTopic -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceIsAboutTopic">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicBelongsToRessource -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicBelongsToRessource">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceIsAboutTopic"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasEntity -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasEntity">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasKeyword -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasKeyword">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicIsInterestedBy -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicIsInterestedBy">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInTopic"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInKeyword -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInKeyword">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordIsInterestedBy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInTopic -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInTopic">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasFrequency -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasFrequency"/>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasName"/>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasShortName -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasShortName"/>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasType -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasType"/>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasWeight -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasWeight"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&owl;Thing"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#entityHasKeywords"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#entityHasTopic"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&owl;Thing"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#keywordHasTopic"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasWeight"/>
+                        <owl:someValuesFrom rdf:resource="&xsd;double"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&owl;Thing"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceHasKeyword"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#ressourceIsAboutTopic"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&owl;Thing"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#topicHasKeyword"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#hasWeight"/>
+                        <owl:someValuesFrom rdf:resource="&xsd;double"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#User -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&owl;Thing"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInKeyword"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#userIsInterestedInTopic"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+        <hasName rdf:datatype="&xsd;string">Bianca Gotthart</hasName>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#BlaTopic -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#BlaTopic">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <hasName rdf:datatype="&rdfs;Literal">Bla Topic</hasName>
+        <topicIsInterestedBy rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#Smartphone -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Smartphone">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <hasName rdf:datatype="&rdfs;Literal">Smartphone</hasName>
+        <hasWeight>1</hasWeight>
+        <keywordIsInterestedBy rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart"/>
+        <keywordHasTopic rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestTopic"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestEntity -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestEntity">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity"/>
+        <hasType rdf:datatype="&rdfs;Literal">Person</hasType>
+        <hasName rdf:datatype="&rdfs;Literal">Test Entity</hasName>
+        <entityHasTopic rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestTopic"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestKeyword -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestKeyword">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+        <hasName rdf:datatype="&rdfs;Literal">Test Keyword</hasName>
+        <keywordIsInterestedBy rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart"/>
+        <keywordHasTopic rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestTopic"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestTopic -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestTopic">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+        <hasName rdf:datatype="&rdfs;Literal">Test Topic</hasName>
+        <topicIsInterestedBy rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestUser -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#TestUser">
+        <rdf:type rdf:resource="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+        <hasName rdf:datatype="&xsd;string">Test User</hasName>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Entity"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Keyword"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Ressource"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#Topic"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/ontologies/2013/0/ex.owl#User"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.3.1824) http://owlapi.sourceforge.net -->
+

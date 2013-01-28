@@ -1,0 +1,18 @@
+//content_scripts
+
+"content_scripts" : [
+    {
+      "matches" : [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js" : ["contentscript.js"],
+      "run_at" : "document_idle",
+      "all_frames" : true
+    }
+  ]
+
+//background script
+"background": { 
+     "scripts": ["background.js"] 
+  },

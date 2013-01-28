@@ -1,0 +1,104 @@
+\begin{thebibliography}{10}
+
+\bibitem{_open_2013}
+Open directory project.
+\newblock http://dmoz.org/, 2013.
+
+\bibitem{backett_rdf/xml_2004}
+D.~Backett and B.~{McBride}.
+\newblock {RDF/XML} syntax specification.
+\newblock {www.w3.org/TR/rdf-syntax-grammar/}, 2004.
+
+\bibitem{berners-lee_linked_2006}
+T.~Berners-Lee.
+\newblock Linked data.
+\newblock {http://www.w3.org/DesignIssues/LinkedData.html}, 2006.
+
+\bibitem{brickley_friend_2010}
+D.~Brickley and L.~Miller.
+\newblock The friend of a friend ({FOAF)} vocabulary specification.
+\newblock http://xmlns.com/foaf/spec/, Aug. 2010.
+
+\bibitem{brickley_weighted_2010}
+D.~Brickley, L.~Miller, T.~Inkster, Y.~Zeng, Y.~Wang, D.~Damljanovic, Z.~Huang,
+  S.~Kinsella, J.~Breslin, and B.~Ferris.
+\newblock The weighted interests vocabulary 0.5.
+\newblock http://smiy.sourceforge.net/wi/spec/weightedinterests.html, Sept.
+  2010.
+
+\bibitem{chan_non-invasive_1999}
+P.~K. Chan.
+\newblock {\em A Non-Invasive Learning Approach to Building Web User Profiles}.
+\newblock 1999.
+
+\bibitem{chirita_using_2005}
+P.~A. Chirita, W.~Nejdl, R.~Paiu, and C.~Kohlschütter.
+\newblock Using {ODP} metadata to personalize search.
+\newblock In {\em Proceedings of the 28th annual international {ACM} {SIGIR}
+  conference on Research and development in information retrieval}, {SIGIR}
+  '05, page 178–185, New York, {NY}, {USA}, 2005. {ACM}.
+
+\bibitem{dotsika_semantic_2010}
+F.~Dotsika.
+\newblock Semantic {APIs:} scaling up towards the semantic web.
+\newblock {\em Int. J. Inf. Manag.}, 30(4):335–342, Aug. 2010.
+
+\bibitem{kim_learning_2003}
+H.~R. Kim and P.~K. Chan.
+\newblock Learning implicit user interest hierarchy for context in
+  personalization.
+\newblock In {\em Proceedings of the 8th international conference on
+  Intelligent user interfaces}, {IUI} '03, page 101–108, New York, {NY},
+  {USA}, 2003. {ACM}.
+
+\bibitem{marchiori_towards_2004}
+M.~Marchiori.
+\newblock Towards a people's web: Metalog.
+\newblock In {\em Proceedings of the 2004 {IEEE/WIC/ACM} International
+  Conference on Web Intelligence}, {WI} '04, page 320–326, Washington, {DC},
+  {USA}, 2004. {IEEE} Computer Society.
+
+\bibitem{min_building_2011}
+J.~Min and G.~J. Jones.
+\newblock Building user interest profiles from wikipedia clusters.
+\newblock July 2011.
+
+\bibitem{nakatsuji_detecting_2009}
+M.~Nakatsuji, M.~Yoshida, and T.~Ishida.
+\newblock Detecting innovative topics based on user-interest ontology.
+\newblock {\em Web Semant.}, 7(2):107–120, Apr. 2009.
+
+\bibitem{ramanathan_creating_2009}
+K.~Ramanathan and K.~Kapoor.
+\newblock Creating user profiles using wikipedia.
+\newblock In {\em Proceedings of the 28th International Conference on
+  Conceptual Modeling}, {ER} '09, page 415–427, Berlin, Heidelberg, 2009.
+  Springer-Verlag.
+
+\bibitem{smith_owl_2004}
+M.~K. Smith, C.~Welty, and D.~L. {McGuinnes}.
+\newblock {OWL} web ontology language guide.
+\newblock {http://www.w3.org/TR/owl-guide/}, 2004.
+
+\bibitem{srinvas_explicit_2012}
+C.~Srinvas.
+\newblock Explicit user profiles for semantic web search using {XML}.
+\newblock {\em International Journal of Engineering Research and Applications
+  ({IJERA)}}, 2(6):234--241, Dec. 2012.
+
+\bibitem{szomszor_semantic_2008}
+M.~Szomszor, H.~Alani, I.~Cantador, K.~{O'Hara}, and N.~Shadbolt.
+\newblock Semantic modelling of user interests based on cross-folksonomy
+  analysis.
+\newblock In {\em Proceedings of the 7th International Conference on The
+  Semantic Web}, {ISWC} '08, page 632–648, Berlin, Heidelberg, 2008.
+  Springer-Verlag.
+
+\bibitem{tao_tums:_2012}
+K.~Tao, F.~Abel, Q.~Gao, and G.-J. Houben.
+\newblock {TUMS:} twitter-based user modeling service.
+\newblock In {\em Proceedings of the 8th international conference on The
+  Semantic Web}, {ESWC'11}, page 269–283, Berlin, Heidelberg, 2012.
+  Springer-Verlag.
+
+\end{thebibliography}

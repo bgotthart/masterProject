@@ -1,0 +1,185 @@
+% THIS IS SIGPROC-SP.TEX - VERSION 3.1
+% WORKS WITH V3.2SP OF ACM_PROC_ARTICLE-SP.CLS
+% APRIL 2009
+%
+% It is an example file showing how to use the 'acm_proc_article-sp.cls' V3.2SP
+% LaTeX2e document class file for Conference Proceedings submissions.
+% ----------------------------------------------------------------------------------------------------------------
+% This .tex file (and associated .cls V3.2SP) *DOES NOT* produce:
+%       1) The Permission Statement
+%       2) The Conference (location) Info information
+%       3) The Copyright Line with ACM data
+%       4) Page numbering
+% ---------------------------------------------------------------------------------------------------------------
+% It is an example which *does* use the .bib file (from which the .bbl file
+% is produced).
+% REMEMBER HOWEVER: After having produced the .bbl file,
+% and prior to final submission,
+% you need to 'insert'  your .bbl file into your source .tex file so as to provide
+% ONE 'self-contained' source file.
+%
+% Questions regarding SIGS should be sent to
+% Adrienne Griscti ---> griscti@acm.org
+%
+% Questions/suggestions regarding the guidelines, .tex and .cls files, etc. to
+% Gerald Murray ---> murray@hq.acm.org
+%
+% For tracking purposes - this is V3.1SP - APRIL 2009
+
+\documentclass{acm_proc_article-sp}
+
+\begin{document}
+
+\title{Benutzerprofile für Semantic Web Anwendungen}
+\subtitle{Ein Überblick}
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{1} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor
+Bianca Gotthart\\
+       \affaddr{Fachhochschule Hagenberg}\\
+       \affaddr{Softwarepark 11}\\
+       \affaddr{4232 Hagenberg, Österreich}\\
+       \email{bianca.gotthart@fh-hagenberg.at}
+}
+\date{15 Jänner 2013}
+% Just remember to make sure that the TOTAL number of authors
+% is the number that will appear on the first page PLUS the
+% number that will appear in the \additionalauthors section.
+\maketitle
+\begin{abstract}
+Im Web gibt es eine gro\ss e Menge an Daten. Um für den Benutzer einen Überblick zu ermöglichen, sind Benutzerprofile im Web von besonderer Bedeutung geworden. Mit Hilfe von semantischen Technologien und Konzepten kann auf kontextbezogene und individuelle Interessen vom Benutzer zugegriffen werden, um dies als Basis für die Personalisierung im Web zu verwenden. Diese Arbeit soll einen Überblick geben, welche Arten von Konzepte für die Erstellung von Benutzerprofilen angewendet werden. 
+\end{abstract}
+
+\keywords{Web Personalisierung, Benutzerprofile, Semantic Web} % NOT required for Proceedings
+
+\section{Einleitung}
+Eine gro\ss e Menge an Daten werden täglich im Web veröffentlicht. Sich einen Überblick in der Menge an Informationen zu beschaffen ist für einen Benutzer nur schwer möglich. Zu relevanten Informationen zu kommen ist oftmals nicht einfach. \cite{marchiori_towards_2004}
+
+Personalisierung im Web ist eine Eigenschaft, die im Word Wide Web benötigt wird, um den Informationsüberfluss für den Benutzer zu regulieren. Wenn Wissen vom Benutzer vorhanden ist, ist es möglich, dies als Basis für die Filterung von Informationen zu verwenden. Mit den Technologien des Semantic Webs ist es möglich, nicht nur rein auf die vorhandenen Wörter zu achten, sondern auch den Kontext eines Textes zu ermitteln und somit Verknüpfungen zueinander zu schaffen. 
+
+Ein wichtiger Aspekt von Personalisierung ist die Erstellung von Benutzerprofilen. In der Domäne Web bedeutet dies somit das Sammeln von Informationen über einen Benutzer. Das Ziel dieses Vorgangs ist, die Interessen des Benutzers zu erkennen und dies an die Filterung und Darstellung von Webseiten individuell anzupassen. \cite{srinvas_explicit_2012} 
+
+In dieser Arbeit möchte ich einen Überblick geben, wie die Speicherung von Wissen über Webseiten und Interessen von Benutzer mit Hilfe von Semantic Web Technologien in anderen Projekten umgesetzt wurden und aktuelle Standards erläutern. Der Fokus dieser Arbeit liegt nicht auf die Extrahierung von Daten, sondern vielmehr auf die möglichen Konzepte, wie Benutzerprofile erstellt werden können.
+
+\section{Sammlung von Benutzerdaten}
+Für das Modellieren von Benutzerprofilen müssen Daten über den Benutzer gesammelt werden, sowohl demographische, als auch Wissen über Interessen, Verhalten und Vorlieben, um Informationen personalisiert zu filtern. Das Sammlung von Informationen kann entweder impliizt oder explizit geschehen. 
+
+Bei der expliziten Sammlung von Informationen wird der Benutzer gebeten, selbst Interessen zu definieren, indem diese entweder vom Benutzer selbst definiert werden oder diese mit Hilfe von Bewertung einem System mitgeteilt werden. Um für letzteres ein Beispiel zu nennen \cite{srinvas_explicit_2012}, könnte der Benutzer nach dem Lesen eines Artikels abstimmen, ob dieser die Interessen getroffen hat oder eben nicht. Ein System kann somit dieses Wissen über den Benutzer speichern und auswerten, um bei Suchanfragen die Ergebnisse dahingegen anzupassen. 
+Die Nachteile bei der expliziten Angabe von Interessen ist allerdings die Zeitkomponente. Interessen können sich sehr schnell ändern und ein Profil ständig anzupassen würde für den Benutzer Aufwand und Konsequenz abverlangen. 
+
+Im Gegensatz dazu werden bei der impliziten Benutzermodellierung die Interessen mit diversen Algorithmen automatisch analysiert, wobei der Benutzer keinen Eigenaufwand haben soll und dies im besten Falle gar nicht bemerkt. \cite{srinvas_explicit_2012} Die Daten werden während des Surfens gesammelt, indem von den Seiten, die der Benutzer betrachtet, Informationen wie zum Beispiel relevante Begriffe, Entitäten, Kategorien gespeichert werden. Deswegen konzentrieren sich viele Recherchen auf die implizite Generierung von Benutzerdaten, da diese die Interessen des Benutzers am deutlichsten widerspiegeln, im besonderen mit semantischen Analysen im Hintergrund, und am wenigsten Zusatzaufwand für diesen bringen.  
+
+Bei \cite{chan_non-invasive_1999} Ansatz wurde bereits ein adaptiver personalisierter Web Browser entwickelt, der rein auf implizite Weise die Informationen des Benutzers sammelt. Das Benutzerverhalten wird als Benutzerprofil gespeichert. Es wurde ein Messwert entwickelt, der die Interessantheit besuchter Webseiten bestimmt. Sie definieren ein Benutzerprofil mit zwei Komponenten: \textit{Page Interest Estimator} (PIE) und einem \textit{Web Access Graph} (WAG). Basierend auf den PIE, der vom Verhalten des Benutzers erlernt wird, werden die Interessen charakterisiert. Der WAG beinhaltet die besuchten Webseiten mit den gesammelten Mustern und mit Hilfe des PIE wird deren Relevanz errechnet. 
+Um die Interessen zu sammeln, wurden folgende Quellen berücksichtigt: Browsing History (Worte mit hoher Häufigkeit wurden extrahiert), Seiten die als Lesezeichen abgespeichert wurden, besuchte verlinkte Seiten auf der Webseite und Server Log Dateien (Grö\ss e der Seite, Zeitpunkt für die Abfrage der Aktualität, IP Adresse, URL). 
+
+Einige Arbeiten erstellen Benutzerprofile als hierarchische Baumstruktur, worin die Interessen des Benutzers gespeichert werden. Kim und Chen \cite{kim_learning_2003} unterscheiden allgemeine Interessensgebiete, die langfristig zutreffen und spezifischen Interessensgebieten, die eher von kurzfristiger Dauer sind. Bei diesem Ansatz werden nicht Dokumente geclustert, sondern vielmehr Eigenschaften der Dokumente, worin Dokumente eingegliedert werden. 
+Als Hauptzweige werden die allgemeinen Interessen (langfristigen) und die Unterknoten als spezifische (kurzfristigen) Interessensbegriffe bezeichnet. Dieser Ansatz wird laut Kim und Chen \textit{User Interest Hierarchy} (UIH) genannt. Als Daten werden dabei Webseiten verwendet, die der Benutzer besucht hat und häufig vorkommende Wörter werden extrahiert, die anschlie\ss end mit Ähnlichkeitsalgorithmen geclustert in die Hierarchie eingefügt werden. Dadurch kann Zugehörigkeit zwischen Begriffen zu Themen ermöglicht werden.
+
+\section{Semantic Web Standards}
+Hit Hilfe von Semantic Web Technologien können Benutzerprofile angereichert werden, um kontextbezogene Informationen aus Web-Inhalten zu extrahieren und diese dem Benutzer zuzuweisen. Im folgenden werden Semantic Web Technologien erläutert, die in der Praxis eingesetzt werden.
+
+\subsection{Ressource Description Format (RDF)}
+Ressource Description Format (RDF) \cite{backett_rdf/xml_2004} ist eine W3C Spezifikation. RDF ist eine formale Sprache, um allgemeine webbasierte Informationen auszuzeichnen. Eine Information wird in einem Triple repräsentieren (Subjekt, Prädikat und Objekt). Das Subjekt bezeichnet eine Ressource im Web mit einer URI und das Prädikat beschreibt die Beziehung zwischen Subjekt und Objekt. Ein Objekt kann wiederum eine Ressource sein oder ist als Literal ausgezeichnet. Im Allgemeinen ist es eine standardisierte semantische Annotationsmethode, wodurch Austauschbarkeit von Informationen ermöglicht wird. 
+
+\subsection{Ontologie und Web Ontology Language}
+Eine Ontologie ist eine Menge an Konzepten um Inhalte zu organisieren und zu klassifizieren. Es modelliert Entitäten, logische Verknüpfungen und Beziehungen in Form eines Graphes. Der Standard von \textit{Web Ontology Language} (OWL) \cite{smith_owl_2004} im Gegenzug zu RDF ermöglicht es, mehr Bedeutung den Ressourcen zuzuordnen. Eigenschaften können nicht mehr nur auf einzelne Domäne fixiert werden, sondern vielmehr auch das Verhalten zueinander beschreiben. \cite{berners-lee_linked_2006}
+
+Um Innovation in einer Blog Community festzustellen \cite{nakatsuji_detecting_2009}, ist OWL für die Beschreibung einer Template Ontologie eingesetzt worden. Dafür ist eine Ontologie für die spezielle Domäne entwickelt worden. Dafür ist Expertenwissen not-wendig, um alle möglichen Aspekte (Klassen und Eigenschaften) dieser Domäne abzudecken. Die Ontologie wurde verwendet, um eine hierarchische Struktur für die Beziehung zwischen Klassen und Eigenschaften zu erstellen. Die Interessen wurden den Blogartikel von den Benutzern entnommen, indem alle Beiträge klassifiziert und der Ontologie zugewiesen wurden, ohne einer expliziten Einwirkung des Benutzers. Mit Hilfe von Ähnlichkeitsmessungen und Häufigkeitsvorkommnissen einzelner Instanzen in Blogartikeln, wurden innovative Themen herauskristallisiert, welche den Interessen der Community entsprechen.
+
+\subsection{Linked Data}
+Bei dem Konzept von Linked Data handelt es sich darum, Informationen im Web in strukturierter Art und Weise anzubieten. Die Daten sollen von Maschinen lesbar gemacht sein, damit die Bedeutung von Ressourcen auch für Maschinen interpretierbar ist. Des weiteren ermöglicht es eine Verlinkung mit externen Datenquellen. Der Zugriff ist nach Berners-Lee Definition mit einer URI (Unified Ressource Identifier) anzubieten, damit Leute im Web sich die Ressourcen auch ansehen und nützliche Informationen verlinken können.
+
+%Open Calais, Zemanta
+\subsubsection{DMOZ}
+
+\textit{DMOZ} ist ein Open Source Projekt, dass über 4 Millionen Webseiten in 590.000 Kategorien eingeordnet hat. Die Datenstruktur ist als Baum aufgebaut, worin die Kategorien die Knoten und die Webseiten die Blätter sind. Knoten können auf Grund von der reinen symbolischen Verlinkung zu mehreren Elternknoten gehören. \cite{_open_2013}
+
+DMOZ ist bereits in einigen Projekt angewendet worden, um eine personalisierte Suche zu ermöglichen. Wie in \cite{chirita_using_2005}) angewandt, wodurch der Benutzer selbst Interessen definieren muss, die aus der DMOZ Datenbank aufgelistet werden. Diese Themen werden dann in den jeweiligen Suchalgorithmen miteinberechnet, wie zum Beispiel für die Berechnung des PageRanks bei Google. Als Basis werden verschiedene Algorithmen angewandt, die zum Beispiel auf die Messung der Distanz zwischen zwei Knoten im DMOZ System beruht, je weiter auseinander zwei Knoten liegen, desto weniger haben sie miteinander zu tun.
+
+\subsubsection{DBpedia}
+\textit{DBpedia} veröffentlich die Daten aus Wikipedia in einer strukturierten und geordneten Art und Weise. Bereits viele Projekte wurden mit dieser Basis entwickelt, um Benutzerprofile oder Web-Ressourcen zu klassifizieren oder anzureichern. Wikipedia hat eine gro\ss e Menge an Informationen, die mit Kategorien versehen sind. In einem Kategorie System vom Wikipedia sind die Dokumente in zwölf Hauptkategorien unterteilt: Referenz, Kultur, Geografie, Gesundheit, Geschichte, Mathematik, Natur, Menschen, Philosophie, Religion, Gesell- schaft, Technologie. \cite{min_building_2011}
+Bei \cite{ramanathan_creating_2009} wird ein hierarchisches Benutzerprofil mit Hilfe des Wikipedia Konzeptes erstellt, wobei zuerst Webseiten und Dokumente dem Wikipedia Konzept zugeordnet werden.
+
+\subsubsection{Semantic APIs}
+Um aus einem Text semantische Information herauszubekommen, gibt es bereits eine Vielzahl an Webservices, die dabei Unterstützung bieten, um Entitätenextraktion, Zuweisung von passenden Kategorien oder Empfehlungen für verwandte Artikel im Web zu erhalten. Diese Services basieren auf den Linked Open Data Systemen oder haben ihre eigene Ontologie aufgebaut. 
+Im Allgemeinen beiten diese Webservices eine semantische Analyse von Texte bzw. URLs im Web an, die folgende Arten als Output generieren: Textextraktionen (wie zum Beispiel Entitäten-Extraktion, Schlüsselwörter- Extration) oder Textklassifikationen in unterschiedlicher Form (RDF, JSON, XML). \cite{dotsika_semantic_2010} 
+
+Die bekanntesten APIs sind OpenCalais \footnote{http://www.opencalais.com/}, Zemanta \footnote{http://www.zemanta.com/}, Alchemy API \footnote{http://www.alchemyapi.com/} und OpenAmplify \footnote{http://www.openamplify.com/}. OpenCalais bietet ebenfalls eine eigene Ontologie an\footnote{http://www.opencalais.com/documentation/opencalais-web-service-api/calais-ontology-owl}. 
+
+\subsubsection{FOAF Ontologie}
+
+Das Projekt \textit{TUMS}, wie in \cite{tao_tums:_2012} beschrieben, bietet ein Service an, dass mit Hilfe von Twitter Nachrichten ein Benutzerprofil erstellt, indem die Interessen auf Basis einer Ontologie zugewiesen werden. Für die Repräsentation des Benutzers wird auf das Friend-Of-A-Friend (FOAF) Projekt \cite{brickley_friend_2010} zurückgegriffen, die Informationen über den Benutzer zu sammeln. Dieses Konzept beinhaltet sowohl allgemeine Informationen, aber auch eine Möglichkeit, die Interessen mit Hilfe des \textit{Weighted Interest Vocabulary} \cite{brickley_weighted_2010} zu gewichten. Die Informationen werden in diesem Ansatz entweder themenbasiert, tagbasiert oder entitätenbasiert gespeichert und als Gewichtung wird die Begriffshäufigkeit, die ein Benutzer verwendet, angewandt. So könnte eine mögliche Auszeichnung eines Benutzers aussehen (entnommen von \cite{tao_tums:_2012} ):
+\begin{verbatim}
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    @prefix wi: <http://purl.org/ontology/wi/core#> .
+    @prefix wo: <http://purl.org/ontology/wo/core#> .
+    @prefix ex: <http://example.org/> .
+    @prefix dbpedia: <http://dbpedia.org/resource/>
+    <http://twitter.com/taubau>
+      a foaf:Person ;
+      foaf:name "Ke Tao";
+      wi:preference [
+         a wi:WeightedInterest ;
+         wi:topic dbpedia:Jazz ;
+         wo:weight [
+a wo:Weight ; wo:weight_value 10.0 ; wo:scale ex:AScale
+].
+\end{verbatim}
+
+Oftmals werden Ansätze in gemischter Form umgesetzt. Wie bei \cite{szomszor_semantic_2008} liegt der Fokus darin, dass eine Architektur mit Hilfe von den Benutzerinteraktion in den unterschiedlichen Folkonomy Seiten erstellt wird. Um die tatsächlichen Interessen eines Benutzers zu erhalten, werden die Tags aus diesen Seiten entnommen und einer semantischen Analyse und Zuordnung unterzogen. Um eine allgemeine Lösung für die Zuordnung von Tags und deren Beziehungen zu schaffen, wird dafür auf die Wikipedia Kategorien zurückgegriffen, da Wikipedia eine gro\ss e Palette an Themen anbietet. Ein wichtiger Bestandteil dieses Ansatzes ist, dass Tags im vorhinein gefiltert und zusammengefügt werden und auf Grund von Ähnlichkeiten zwischen Begriffen wie zum Beispiel \textit{secondlife} und \textit{second-life} vom System als das Gleiche angesehen werden. Mit Hilfe der FOAF-Ontologie wird das neue Thema dem Benutzerprofil gespeichert, wofür eine RDF Profil mit dem FOAF-Attribut \textit{interest} verwendet wird, um die Wikipeda Kategorie mit dem Benutzer zu verknüpfen. Eine Kategorie erhält noch eine Gewichtung, je nachdem wie oft ein Tag dieser Kategorie hinzugefügt und dieser vom Benutzer verwendet wurde. 
+
+
+\section{Conclusion}
+In diesem Paper wurden mögliche Konzepte, wie Benutzerprofile aufgebaut werden können, erläutert. Der Fokus lag auf allgemeinen Informationen über die Sammlung von Daten, bis hin zu semantischen Technologien, die verwendet werden können, um kontextuell Informationen zu erhalten und zu speichern. Mein Ansatz wird mehrere Theorien vermischen. Mit Hilfe von ausgewählten Semantic APIs wird Textextraktion durchgeführt und mit Hilfe des Wikipedia Konzeptes kategorisiert. Als Input Daten wird zum einen die Browser History des Benutzers angesehen, um die Interessen fest- zustellen, und zum anderen werden RSS-Feeds kategorisiert, um diese für den Benutzer als Information täglich anzubieten. Als Technologie wird eine minimalistische Ontologie (mit Entitäten, Themen, Schlüsselwörter) verwendet, worin sowohl das Benutzerprofil, als auch die RSS-Daten gespeichert werden, um eine Verbindung zwischen diesen zwei Konzepten zu generieren.
+%\end{document}  % This is where a 'short' article might terminate
+
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{SurveyPaper}  % sigproc.bib is the name of the Bibliography in this case
+
+%\balancecolumns
+\balancecolumns
+\end{document}
