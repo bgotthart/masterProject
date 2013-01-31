@@ -23,14 +23,90 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
     public function __construct() {
         $this->initMainTopicClassification();
-        $this->blacklist_topics = array("Wikipedia_categories", "Categories_by_","Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "_by_", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
+        $this->blacklist_topics = array("Wikipedia_categories", "_in_the", "Categories_by_","Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "_by_", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
 
 
         // $this->blacklist_topics = array();
     }
+    
+    
+    public function calculateSimilarity($node1, $node2){
+         
+        
+        //todo unterscheidung artikel u kategorie
+        $node1Categories = $this->getCategoriesOfArticle($node1);
+        $node2Categories = $this->getCategoriesOfCategory($node2);
+          
+        print_r($node2Categories);
+        
+        for($i = 0; $i<3; $i++){
+            $categories = $this->getCategoriesOfCategory($node1Categories[$i]);
+            
+            array_push($node1Categories, $categories);
+        }
+        
+        for($i = 0; $i<3; $i++){
+            
+            print_r($node2Categories);
+            die();
+            $categories = $this->getCategoriesOfCategory($node2Categories[$i]);
+            
+            array_push($node2Categories, $categories);
+        }
+        
+        print_r($node1Categories);
+        print_r($node2Categories);
+         
+        die("calc similarity");
+     }
 
+    private function lookForDBpediaTerm($term){
+        /*
+         * SELECT *
+            WHERE
+            {
+
+            <http://dbpedia.org/resource/Programming_(disambiguation)> <http://dbpedia.org/ontology/wikiPageDisambiguates> ?y .
+
+            <http://dbpedia.org/resource/Programming> <http://dbpedia.org/ontology/wikiPageRedirects> ?y .
+
+            }
+         */
+    }
     public function getCategoriesOfArticle($keyword) {
 
+        
+        try {
+            $query = '
+                    SELECT ?x WHERE {
+                        <http://dbpedia.org/resource/' . $keyword . '>
+                        <http://purl.org/dc/terms/subject>
+                        ?x
+                      }
+                ';
+
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=json";
+
+            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
+            $result = array();
+            foreach ($categories['results']['bindings'] as $entry) {
+                $category = $entry['x']['value'];
+                
+                array_push($result, $category);
+                
+     
+                
+
+            }
+            return $result;
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+    
+    public function getCategoriesOfArticleWithCategories($keyword) {
+
+        
         try {
             $query = '
                     SELECT ?x WHERE {
@@ -49,17 +125,22 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                 $category = $entry['x']['value'];
                 
                 
-                $array = array(array($category));
+                $array = array($category);
                 
-                $this->iterative_deepening_depth_first_search($array, $category);
+                //if($category == "http://dbpedia.org/resource/Category:Smartphones"){
+                    
+                    
+                     $this->iterative_deepening_depth_first_search($array, $category);
+
+                //}
                  
-                //die("!!!!only one time!!!!!");
+               // die("!!!!only one time!!!!!");
                 
 
             }
 
-            //echo("GRAPH");
-            //print_r($this->graph);
+            echo("...GRAPH...");
+            print_r($this->graph);
             die("getCategoriesOfArticle");
         } catch (SQLException $oException) {
             echo ("Caught SQLException: " . $oException->sError );
@@ -71,50 +152,62 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             $this->graph[$parent] = $nodes;
         }
     }
-    private function iterative_deepening_depth_first_search($nodes) {
+     private function iterative_deepening_depth_first_search($nodes) {
                
-        print_r($nodes);
-        $children = new SplDoublyLinkedList();
-        
-        $nodesChildren = array();
+          $childrenArray = array();
+
         if(count($nodes) > 0){
             //parse one category
-            foreach($nodes[0] as $node){
+            
+            foreach($nodes as $node){
+                             
                 
                 if(in_array($node, $this->main_topic_classification)){
-                    echo("\n FOUND GOAL in: ". $node);
+                    echo("\n FOUND GOAL in node: ". $node);
+                    array_push($this->graph, $node);
                     continue;
                 }
                 
-                $newNodes = $this->getCategoriesOfCategory($node);
                 
-                if(count($newNodes) > 0){
-                    //array_push($children, $newNodes);
-                    
-                    $children->push($newNodes);
+                $children = $this->getCategoriesOfCategory($node);
+                
+                if(!array_key_exists($node, $childrenArray) && count($children) > 0){
+                    $childrenArray[$node] = array();
                 }
                 
-  
+                if(count($children) > 0){
+                    foreach($children as $child){
+                        if(in_array($child, $this->main_topic_classification)){
+                            echo("\n FOUND GOAL in child: ". $child);
+                            array_push($this->graph, $child);
+                            continue;                        
+                            
+                        }
+                        else if(!in_array($child, $this->graph)){
+                            array_push($childrenArray[$node], $child);
+                        }
+                        
+                        array_push($this->graph, $child);
+                       
+                        
+                    }
+                }
             }
-            
-            
-            echo("\n nodes \n");
-            print_r($nodes);
-            echo("\n children \n");
-            print_r($children);
-   
         }
         
-        
-        if(count($children) > 0){
-            $this->iterative_deepening_depth_first_search($children);
-        }else{
-            return;
+        if(count($childrenArray) > 0){
+            
+            //print_r($childrenArray);
+            $keys = array_keys($childrenArray);
+            foreach($keys as $key){
+                $this->iterative_deepening_depth_first_search($childrenArray[$key], $key);
+
+            }  
         }
-        
         
         
     }
+
     
     /*ITERATIVE DEEPENING SEARCH*/
     /*

@@ -1,10 +1,11 @@
 <?php
 
+/*for debuggin*/
 unset($_SESSION['controller']);
 
-    $controller = new MainController();
+$controller = new MainController();
 
-    $_SESSION['controller'] = $controller;
+$_SESSION['controller'] = $controller;
     
 /*
 if(!isset($_SESSION['controller'])){

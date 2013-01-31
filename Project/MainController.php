@@ -15,12 +15,12 @@ class MainController {
     private $DB_store;
     
     public function __construct() {
-
         $this->userInterestst = array();
         
         $this->loadConfigFile();
         $this->DB_store = new DatabaseClass();
 
+        
         $this->userInterestst = $this->DB_store->selectQuery();
 
     }
@@ -55,7 +55,7 @@ class MainController {
 
     public function printUserInterests() {
         $result = "";
-        
+       
         foreach ($this->userInterestst as $topic) {
             $result .= "<p>" . $topic['name'];
             $result .= ": " . $topic['weight'] . "</p>";
@@ -112,7 +112,7 @@ class MainController {
     }
     
     public function callDBpedia(){
-        $keyword = "IOS";
+        $keyword = "Volleyball";
         
         $categories = $this->DB_store->getCategories($keyword);
   

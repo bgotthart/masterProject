@@ -27,7 +27,7 @@ class DatabaseClass {
     private $user_id = "http://www.semanticweb.org/ontologies/2013/0/ex.owl#BiancaGotthart";
 
     public function __construct() {
-        
+    
         $this->dbpedia_database = new DBpedia_DatabaseClass();
 
         $this->loadConfigFile();
@@ -39,7 +39,9 @@ class DatabaseClass {
 
     public function getCategories($keyword) {    
         
-        $this->dbpedia_database->getCategoriesOfArticle($keyword);
+         $this->dbpedia_database->calculateSimilarity($keyword, "http://dbpedia.org/page/Category:Ball_games");
+
+        //$this->dbpedia_database->getCategoriesOfArticleWithCategories($keyword);
     }
     
    
@@ -73,19 +75,8 @@ class DatabaseClass {
                 ?keyword rdf:type owl:NamedIndividual ;
                     rdf:type ex:Keyword ;
                     ex:hasName ?keywordname .
-                OPTIONAL {?keyword ex:hasWeight ?keywordWeight .}
                 }
-                {
-                ?topic rdf:type owl:NamedIndividual ;
-                    rdf:type ex:Topic ;
-                    ex:hasName ?topicname .
-                OPTIONAL {?topic ex:hasWeight ?topicWeight .}
-                }
-                {
-                    ?keyword ex:keywordHasTopic ?topic .
-                }UNION{
-                    ?topic ex:topicHasKeyword ?keyword .
-                }
+                
                 
             }';
         $rows = $this->arc_store->query($q, 'rows');
@@ -442,13 +433,13 @@ class DatabaseClass {
 
                     $topics[$row['topic']]['keywords'] = $keywords;
                 } else {
-                    $r = '<em>No data returned</em>';
+                    echo( '<em>No data returned</em>');
                 }
             }
 
             //$r .='</table>'."\n";
         } else {
-            $r = '<em>No data returned</em>';
+            echo( '<em>No data returned</em>');
         }
 
         /*
@@ -456,12 +447,16 @@ class DatabaseClass {
           'CONSTRUCT  { ?x rdf:type ex:User . ?x ex:hasName  "Bianca Gotthart" }
           WHERE {?x rdf:type ex:User . ?x ex:hasName ?name } ';
          */
+        
+        
         return $topics;
     }
 
     private function initDBStore() {
 
         echo("init database");
+        
+        
         $config_xml = $this->loadConfigFile();
 
         $db_config = array(
@@ -484,7 +479,8 @@ class DatabaseClass {
             $this->arc_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/Profile_v2.owl>');
 
         }    
- /*       
+        
+    /* 
     $dbpedia_config = array(
             'db_host' => (string)$config_xml->database->db_host,
             'db_name' => (string)$config_xml->database->db_name,
@@ -501,7 +497,7 @@ class DatabaseClass {
         if (!$this->dbpedia_store->isSetUp()) {
             $this->dbpedia_store->setUp();
 
-             $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/article_categories_en.nt>');
+            // $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/article_categories_en.nt>');
 
         } 
 
@@ -513,7 +509,7 @@ class DatabaseClass {
         
         die("finished");
 */
-
+        print_r($this->arc_store->getErrors());
     }
     
     private function loadConfigFile() {
