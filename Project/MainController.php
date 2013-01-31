@@ -18,10 +18,10 @@ class MainController {
         $this->userInterestst = array();
         
         $this->loadConfigFile();
-        $this->DB_store = new DatabaseClass();
+    $this->DB_store = new DatabaseClass();
 
         
-        $this->userInterestst = $this->DB_store->selectQuery();
+        //$this->userInterestst = $this->DB_store->selectQuery();
 
     }
 
@@ -112,7 +112,7 @@ class MainController {
     }
     
     public function callDBpedia(){
-        $keyword = "Volleyball";
+        $keyword = "IOS";
         
         $categories = $this->DB_store->getCategories($keyword);
   

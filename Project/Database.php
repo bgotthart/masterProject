@@ -34,14 +34,14 @@ class DatabaseClass {
 
         $this->initDBStore();
 
-        $this->selectQuery();
+       // $this->selectQuery();
     }
 
     public function getCategories($keyword) {    
         
-         $this->dbpedia_database->calculateSimilarity($keyword, "http://dbpedia.org/page/Category:Ball_games");
+         //$this->dbpedia_database->calculateSimilarity("", "");
 
-        //$this->dbpedia_database->getCategoriesOfArticleWithCategories($keyword);
+        $this->dbpedia_database->getCategoriesOfArticleWithCategories($keyword);
     }
     
    

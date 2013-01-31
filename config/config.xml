@@ -26,6 +26,10 @@ and open the template in the editor.
          <alchemy>
             <apikey>f069682a820c7f47e9d5c1daf863975f39c5ee5b</apikey>
         </alchemy>
+         <google>
+             <apikey>AIzaSyC8KhqZYkRXdKhaUvz67B7IGRzMjzo5lsc</apikey>
+             <customsearhkey>013707050272249182185:ldylhbskn0a</customsearhkey>
+         </google>
     </apis>
     <newsfeeds>
         <feed>
