@@ -5,7 +5,9 @@ require_once('../APIs/zemanta/Zemanta.class.php');
 require_once( "../APIs/alchemy/AlchemyAPI_PHP5-0.8/module/AlchemyAPI.php");
 require_once("../arc2/ARC2.php");
 require_once("../APIs/mediawiki/Wikipedia.class.php");
+
 require_once("Database.php");
+
 
 class MainController {
 
@@ -13,49 +15,46 @@ class MainController {
 
     private $userInterestst;
     private $DB_store;
-    
+
     public function __construct() {
         $this->userInterestst = array();
-        
+
         $this->loadConfigFile();
-    $this->DB_store = new DatabaseClass();
+        $this->DB_store = new DatabaseClass();
 
-        
-        //$this->userInterestst = $this->DB_store->selectQuery();
 
+        $this->userInterestst = $this->DB_store->selectQuery();
     }
 
-   
     public function queryReallyAll() {
-        
+
         $this->DB_store->queryReallyAll();
-        
     }
-    
+
     public function queryAllTriples() {
         $this->DB_store->queryAllTriples();
     }
-    
+
     public function handlingAPIRequests($url) {
 
         //TODO call asynchrone    
         //$responseCalais = $this->callOpenCalaisAPI($url);
         $responseZemanta = $this->callZemantaAPI($url);
         $responseWikipedia = $this->callMediaWikipediaAPI($responseZemanta['keywords']);
-        
+
         $response = array();
 
         $response['opencalais'] = $responseCalais;
 
         $response['zemanta'] = $responseZemanta;
-        
+
         $response['wikipedia'] = $responseWikipedia;
         //return $this->insertUserQuery($response);
     }
 
     public function printUserInterests() {
         $result = "";
-       
+
         foreach ($this->userInterestst as $topic) {
             $result .= "<p>" . $topic['name'];
             $result .= ": " . $topic['weight'] . "</p>";
@@ -86,7 +85,7 @@ class MainController {
     }
 
     private function loadConfigFile() {
-        
+
         return simplexml_load_file("../config/config.xml");
     }
 
@@ -100,41 +99,36 @@ class MainController {
         $entities = $zemanta->parse($content);
         return $entities;
     }
+/*
     public function callMediaWikipediaAPI($terms) {
         print_r($terms);
-        
-        $wikiAPI = new Wikipedia();
-        
-        $response = $wikiAPI->callAPIWithData($terms);
-        
-        echo($response);
-        
-    }
-    
-    public function callDBpedia(){
-        $keyword = "IOS";
-        
-        $categories = $this->DB_store->getCategories($keyword);
-  
-        
-  
-      
 
+        $wikiAPI = new Wikipedia();
+
+        $response = $wikiAPI->callAPIWithData($terms);
+
+        echo($response);
     }
+*/
+    public function saveKeyword() {
+        $keyword = "Volleyball";
+
+        $categories = $this->DB_store->saveKeywords($keyword);
+    }
+
     function getFeed($feed_url) {
-	
-	$content = file_get_contents($feed_url);
-	
-	$x = new SimpleXmlElement($content);
+
+        $content = file_get_contents($feed_url);
+
+        $x = new SimpleXmlElement($content);
         $urlArray = array();
 
-        foreach($x->channel->item as $entry) {
-            array_push($urlArray,$entry->link);
-		
+        foreach ($x->channel->item as $entry) {
+            array_push($urlArray, $entry->link);
         }
-        
+
         return $urlArray;
-   }
+    }
 
     /*
       private function callAlchemyAPI($configXML, $url){

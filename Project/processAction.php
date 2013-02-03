@@ -19,7 +19,9 @@ if(!isset($_SESSION['controller'])){
 */
 
 if(isset($_GET['dbpedia'])){
-    $_SESSION['controller']->callDBpedia();
+
+    
+    $_SESSION['controller']->saveKeyword();
     
     return;
 }

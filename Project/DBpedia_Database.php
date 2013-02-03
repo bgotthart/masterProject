@@ -10,6 +10,8 @@
  *
  * @author biancagotthart
  */
+require_once("../APIs/WikipediaMiningAPI.class.php");
+
 class DBpedia_DatabaseClass extends DatabaseClass {
 
     private $main_topic_classification;
@@ -18,24 +20,35 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     private $depth = 0;
     private $max_depth = 5;
     private $graph = array();
+    private $wikipediaAPI;
+    private $openList;
+    private $closedList;
 
     public function __construct() {
         $this->initMainTopicClassification();
-        $this->blacklist_topics = array("Wikipedia_categories", "_in_the", "Categories_by_", "Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "_by_", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
+
+        $this->blacklist_topics = array("_by_", "WikiProject_", "Wikipedia_categories", "_in_the", "Categories_by_", "Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
+        $this->wikipediaAPI = new WikipediaMiningAPI();
+    }
+
+    public function getCategories($keyword) {
+        //$this->callWikipediaMiningForKeywordInformation($keyword);
+
+
+        $this->getCategoriesForKeyword($keyword);
     }
 
     public function calculateSimilarity($term1, $term2) {
 
-
-        $similarity = $this->wikipediaMiningSimilarity($term1, $term2);
+        //$similarity = $this->ownSimilarityFunctionWithCategories($term1, $term2);
+        //$similarity = $this->wikipediaMiningSimilarity($term1, $term2);
         //$this->googleSimilarityDistance();
-        //$this->dbpediaSimilarityCheck();
-
-        echo("Similarity between " . $term1 . " and " . $term2 . ": " . $similarity);
+        $similarity = $this->dbpediaSimilarityCheck($term1, $term2);
+        //echo("Similarity between " . $term1 . " and " . $term2 . ": " . $similarity);
         return $similarity;
     }
 
-    private function cleaningTerm($term) {
+    private function cleaningCategoryTerm($term) {
         if (strstr($term, 'Category:') !== false) {
             $termArray = explode("Category:", $term);
             $categoryName = $termArray[1];
@@ -43,26 +56,60 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             $categoryName = $term;
         }
 
+
+
+        return $categoryName;
+    }
+
+    private function cleaningTermsForWikipediaMining($term) {
+        $categoryName = $this->cleaningCategoryTerm($term);
+
         if (strstr($categoryName, "_") !== false) {
-            $categoryName = str_replace("_", "%20", $categoryName);
+            $categoryName = str_replace("_", " ", $categoryName);
         }
 
         return $categoryName;
     }
 
     private function wikipediaMiningSimilarity($term1, $term2) {
-
         $similarity = 0.0;
-        $categoryName1 = $this->cleaningTerm($term1);
 
-        $categoryName2 = $this->cleaningTerm($term2);
+        $term1 = $this->cleaningTermsForWikipediaMining($term1);
+        $term2 = $this->cleaningTermsForWikipediaMining($term2);
+        $term1 = $this->wikipediaAPI->searchForTerm($term1);
 
+        $categoryName1 = urlencode($term1);
+        $categoryName2 = urlencode($term2);
         $url = "http://wdm.cs.waikato.ac.nz/services/compare?term1=" . $categoryName1 . "&term2=" . $categoryName2 . "&responseFormat=xml&disambiguationDetails&connections";
 
         $response = $this->sendExternalRequest($url);
 
         $xmlobj = new SimpleXMLElement($response);
 
+        if (($xmlobj->attributes()->error) != null) {
+
+            $unknownTerm = (string) $xmlobj->attributes()->unknownTerm;
+            $newTerm = (string) $this->wikipediaAPI->searchForTerm($unknownTerm);
+
+            $newTerm = urlencode($newTerm);
+
+            if ($newTerm == null) {
+                echo("\n ERROR NO TERM FOUND!!! \n");
+                print_r($unknownTerm);
+                return array("error" => "unknown Term", "term" => $unknownTerm);
+            }
+
+            $url = "http://wdm.cs.waikato.ac.nz/services/compare?term1=" . $categoryName1 . "&term2=" . $newTerm . "&responseFormat=xml&disambiguationDetails&connections";
+
+            $response = $this->sendExternalRequest($url);
+
+            $xmlobj = new SimpleXMLElement($response);
+            if (($xmlobj->attributes()->error) != null) {
+                echo("\n ERROR NO TERM FOUND!!! \n");
+                print_r($unknownTerm);
+                return array("error" => "unknown Term", "term" => $unknownTerm);
+            }
+        }
         $similarity = (float) $xmlobj->attributes()->relatedness;
 
         $connections = $xmlobj->xpath("//connection");
@@ -75,185 +122,153 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         return $similarity;
     }
 
-    private function googleSimilarityDistance() {
-        $url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyC8KhqZYkRXdKhaUvz67B7IGRzMjzo5lsc&cx=013707050272249182185:ldylhbskn0a&q=iPhone&alt=json";
-
-        $response = $this->sendExternalRequest($url);
-
-        $node1Result = json_decode($response);
-
-        print_r($node1Result);
-    }
-
-    private function dbpediaSimilarityCheck() {
-
-        $node1 = "http://dbpedia.org/resource/Category:CNET_Networks";
-        $node2 = "CNET";
-
-        $similarity = 0;
-
-        //todo unterscheidung artikel u kategorie
-        $node1Categories = $this->getCategoriesOfCategory($node1);
-
-
-        /* $node1Category = array();
-          foreach($node1Categories as $node){
-          array_push($$node1Category, $node);
-          }
-          $node1Categories = $node1Category;
-         * 
-         */
-        $node2Categories = $this->getCategoriesOfArticle($node2);
-
-
-        for ($i = 0; $i < 5; $i++) {
-
-            $categories = $this->getCategoriesOfCategory($node1Categories[$i]);
-
-            foreach ($categories as $category) {
-                array_push($node1Categories, $category);
-
-                $subcategories = $this->getCategoriesOfCategory($category);
-
-                foreach ($subcategories as $subcategory) {
-                    array_push($node1Categories, $subcategory);
-                }
-            }
-        }
-
-
-        for ($i = 0; $i < 5; $i++) {
-
-            $categories = $this->getCategoriesOfCategory($node2Categories[$i]);
-
-            foreach ($categories as $category) {
-                array_push($node2Categories, $category);
-
-                $subcategories = $this->getCategoriesOfCategory($category);
-
-                foreach ($subcategories as $subcategory) {
-                    array_push($node2Categories, $subcategory);
-                }
-            }
-        }
-
-        $combindedCats = array();
-        for ($i = 0; $i < count($node1Categories); $i++) {
-
-            if (in_array($node1Categories[$i], $node2Categories) && !in_array($node1Categories[$i], $combindedCats)) {
-                array_push($combindedCats, $node1Categories[$i]);
-                $similarity++;
-            }
-        }
-
-        for ($i = 0; $i < count($node2Categories); $i++) {
-
-            if (in_array($node2Categories[$i], $node1Categories) && !in_array($node2Categories[$i], $combindedCats)) {
-
-                array_push($combindedCats, $node2Categories[$i]);
-                $similarity++;
-            }
-        }
-
-        print_r($combindedCats);
-        print_r($similarity / (count($node1Categories) + count($node2Categories)));
-    }
-
-    private function lookForDBpediaTerm($term) {
-        /*
-         * SELECT *
-          WHERE
-          {
-
-          <http://dbpedia.org/resource/Programming_(disambiguation)> <http://dbpedia.org/ontology/wikiPageDisambiguates> ?y .
-
-          <http://dbpedia.org/resource/Programming> <http://dbpedia.org/ontology/wikiPageRedirects> ?y .
-
-          }
-         */
-    }
-
-    public function getCategoriesOfArticle($keyword) {
-
-
-        try {
-            $query = '
-                    SELECT ?x WHERE {
-                        <http://dbpedia.org/resource/' . $keyword . '>
-                        <http://purl.org/dc/terms/subject>
-                        ?x
-                      }
-                ';
-
-            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=json";
-
-            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
-            $result = array();
-            foreach ($categories['results']['bindings'] as $entry) {
-                $category = $entry['x']['value'];
-
-                array_push($result, $category);
-            }
-            return $result;
-        } catch (SQLException $oException) {
-            echo ("Caught SQLException: " . $oException->sError );
-        }
-    }
-
     private function getBestNode($keyword, $categoriesArray) {
         $bestSimilarity = 0.0;
 
-        $bestNode;
+        $bestNode = "";
         foreach ($categoriesArray as $category) {
+
+            if (in_array($category, $this->main_topic_classification)) {
+                echo("FOUND MAIN ");
+                $bestNode = $category;
+                return $bestNode;
+            }
             $similarity = $this->calculateSimilarity($keyword, $category);
 
             if ($bestSimilarity < $similarity) {
                 $bestNode = $category;
+                $bestSimilarity = $similarity;
             }
         }
 
         return $bestNode;
     }
 
-    public function getCategoriesOfArticleWithCategories($keyword) {
+    public function callWikipediaMiningForKeywordInformation($keyword) {
 
 
         try {
-            $query = '
-                    SELECT ?x WHERE {
-                        <http://dbpedia.org/resource/' . $keyword . '>
-                        <http://purl.org/dc/terms/subject>
-                        ?x
-                      }
-                ';
 
-            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=json";
+            //$categories = $this->callDBpediaWithSparql($keyword);
 
-            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
+            $categories = $this->wikipediaAPI->getArticleDetails($keyword);
+
             $this->graph = array();
 
-            $categoriesArray = $categories['results']['bindings'];
+            $bestNode = $this->getBestNode($keyword, $categories);
 
-            $categoriesArray = array();
+            $this->iterative_deepening_depth_first_search($bestNode, null, $keyword);
+
+            echo("...GRAPH...");
+            print_r($this->graph);
+            die("getCategoriesOfArticle");
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
+    public function getCategoryDetails($term) {
 
 
-            foreach ($categories['results']['bindings'] as $entry) {
-                $category = $entry['x']['value'];
+        try {
+            $term = urlencode($term);
+            $searchUrl = "http://wdm.cs.waikato.ac.nz/services/exploreCategory?title=" . $term . "&labels=true&parentCategories=true&responseFormat=xml";
+
+            $response = $this->sendExternalRequest($searchUrl);
+
+            $xmlobj = new SimpleXMLElement($response);
+
+            $tmp = array(($xmlobj->xpath("/message")));
+
+            $categories = array();
+            foreach ($tmp[0] as $obj) {
+
+                if ($obj->xpath("//parentCategory") != null) {
+                    $parentCategories = $obj->xpath("//parentCategory");
+                    foreach ($parentCategories as $item) {
+                        array_push($categories, (string) $item->attributes()->title);
+                    }
+                }
+            }
+            return($categories);
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
+    public function getArticleDetails($term) {
 
 
-                array_push($categoriesArray, $category);
+        try {
+            $term = urlencode($term);
+            $searchUrl = "http://wdm.cs.waikato.ac.nz/services/exploreArticle?title=" . $term . "&labels=true&parentCategories=true&responseFormat=xml";
 
 
+            $response = $this->sendExternalRequest($searchUrl);
 
-                $array = array($category);
+            $xmlobj = new SimpleXMLElement($response);
 
-                // $this->iterative_deepening_depth_first_search($array, null, $keyword);
+            $tmp = array(($xmlobj->xpath("/message")));
+
+            $categories = array();
+            foreach ($tmp[0] as $obj) {
+
+                if ($obj->xpath("//parentCategory") != null) {
+                    $parentCategories = $obj->xpath("//parentCategory");
+                    foreach ($parentCategories as $item) {
+                        array_push($categories, (string) $item->attributes()->title);
+                    }
+                }
+            }
+
+            return($categories);
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
+    public function getCategoriesForKeyword($keyword) {
+
+
+        $this->graph = array();
+        $this->closedList = array();
+        $this->openList = array();
+        $categoriesArray = array();
+
+        try {
+            $query = 'SELECT DISTINCT * WHERE {
+                <http://dbpedia.org/resource/' . $keyword . '>
+                    <http://purl.org/dc/terms/subject>
+                    ?x
+                    }';
+
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query);
+
+            $response = $this->sendExternalRequest($searchUrl);
+
+            $xmlobj = new SimpleXMLElement($response);
+
+            array_push($this->closedList, $keyword);
+            foreach ($xmlobj->results as $obj) {
+                $array = (array) $obj;
+                foreach ($array["result"] as $a) {
+                    $uri = (string) $a->binding->uri;
+                    array_push($categoriesArray, $uri);
+
+
+                    //add similarity heuristic 
+                    $this->openList[$uri] = array();
+
+                    $this->openList[$uri] = $uri;
+                }
             }
 
             $bestNode = $this->getBestNode($keyword, $categoriesArray);
 
+
+            //array_push($this->graph, $bestNode);
             $this->iterative_deepening_depth_first_search($bestNode, null, $keyword);
-            die();
+
             echo("...GRAPH...");
             print_r($this->graph);
             die("getCategoriesOfArticle");
@@ -268,262 +283,476 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         }
     }
 
-    private function iterative_deepening_depth_first_search($nodes, $parent, $keyword) {
+    private function iterative_deepening_depth_first_search($node, $parent, $keyword) {
 
-        $childrenArray = array();
-
-        if (count($nodes) > 0) {
+        if (count($node) > 0) {
             //parse one category
 
-            foreach ($nodes as $node) {
+
+            if (key_exists($node, $this->openList)) {
+                unset($this->openList[$node]);
+            }
+
+            array_push($this->closedList, $node);
+
+            array_push($this->graph, $node);
+
+            if (in_array($node, $this->main_topic_classification)) {
+                echo("\n FOUND GOAL in node: " . $node);
+                return;
+            }
 
 
-                if (in_array($node, $this->main_topic_classification)) {
-                    echo("\n FOUND GOAL in node: " . $node);
-                    array_push($this->graph, $node);
-                    continue;
-                }
+            $children = $this->getCategoriesOfCategory($node);
+            //$children = $this->wikipediaAPI->getCategoryDetails($node);
+            //add expanded Node to closed list to prevent from circles
 
+            if (count($children) > 0) {
+                foreach ($children as $child) {
 
-                $children = $this->getCategoriesOfCategory($node);
+                    //check if node already expanded (in closed List)
+                    //!!!!!!!and node is not in open list with lower similarity TODO!!!!!!!!!!
+                    if (!key_exists($child, $this->closedList) || !in_array($child, $this->closedList)) {
 
-                if (!array_key_exists($node, $childrenArray) && count($children) > 0) {
-                    $childrenArray[$node] = array();
-                }
-
-                if (count($children) > 0) {
-                    foreach ($children as $child) {
-                        if (in_array($child, $this->main_topic_classification)) {
-                            echo("\n FOUND GOAL in child: " . $child);
-                            array_push($this->graph, $child);
-                            continue;
-                        } else if (!in_array($child, $this->graph)) {
-
-                            array_push($childrenArray[$node], $child);
+                        //add similarity heuristic 
+                        if (!key_exists($child, $this->openList)) {
+                            $this->openList[$child] = array();
                         }
-
-                        array_push($this->graph, $child);
+                        $this->openList[$child] = $child;
                     }
                 }
             }
-        }
 
-        if (count($childrenArray) > 0) {
+            if (count($children) > 0) {
 
-            //print_r($childrenArray);
-            $keys = array_keys($childrenArray);
-            foreach ($keys as $key) {
-                $this->iterative_deepening_depth_first_search($childrenArray[$key], $key, $keyword);
+                $bestNode = $this->getBestNode($keyword, $children);
+
+                if ($bestNode == null) {
+                    echo("ERROR: no best node found in ");
+                    print_r($children);
+
+                    //zurück gehen im baum
+
+                    return;
+                }
+
+
+                $this->iterative_deepening_depth_first_search($bestNode, $node, $keyword);
+            } else {
+                echo("ERROR: children null");
+                print_r($node);
+
+                //TODO: delete old nodes from old path -> update graph object
+                if (in_array($node, $this->openList)) {
+                    unset($this->openList[$node]);
+                }
+
+                $children = array_values($this->openList);
+                $bestNode = $this->getBestNode($keyword, $children);
+
+                $this->iterative_deepening_depth_first_search($bestNode, $node, $keyword);
+
+                return;
             }
         }
     }
 
-    /* ITERATIVE DEEPENING SEARCH */
-    /*
-      private function iterative_deepening_depth_first_search($root) {
-
-      $depth = 0;
-      while (1 == 1) {
-
-      $result = $this->depth_limited_search($root, $depth);
-
-      print_r($result);
-      if (in_array($result, $this->main_topic_classification)){
-      return result;
-      }
-
-      $depth = $depth + 1;
-      }
-      }
-
-      private function depth_limited_search($node, $depth) {
-
-      if ($depth == 0 && in_array($node, $this->main_topic_classification)) {
-      echo("+++++found main topic++++++");
-      return $node;
-      } else if ($depth > 0) {
-
-      $children = $this->getCategoriesOfCategory($node);
-
-      echo("\n node \n");
-      print_r($node);
-      echo("\n children \n");
-      print_r($children);
-
-      foreach ($children as $child) {
-
-      $this->depth_limited_search($child, $depth -1 );
-      }
-      } else {
-      return null;
-      }
-      }
-     */
-
-    /*
-      private function iterative_deepening_depth_first_search($nodes, $root) {
-
-      echo("nodes: \n");
-
-      print_r($nodes);
-      $nodesChildren = array();
-      if(count($nodes) > 0){
-      //parse one category
-      foreach($nodes[0] as $node){
-      $children = array();
-      if(in_array($node, $this->main_topic_classification)){
-      echo("\n FOUND GOAL in: ". $node);
-      return;
-      }
-
-      $children = $this->getCategoriesOfCategory($node);
-
-      // print_r($children);
-
-      $nodesChildren[$node] = $children;
-
-      array_push($this->graph, $nodesChildren);
-      if(count($children) > 0 ){
-      foreach($children as $child){
-      $childArray = array(array($child));
-      print_r($child);
-      $this->iterative_deepening_depth_first_search($childArray,$child);
-      }
-      }
+    private function prepareTermNameForDBpedia($term) {
 
 
+        if (strstr($term, 'Category:') !== false) {
+            $termArray = explode("Category:", $term);
+            $category = $termArray[1];
+        } else {
+            $category = $term;
+        }
 
-      }
+        if (strstr($category, " ") !== false) {
+            $category = str_replace(" ", "_", $term);
+        }
 
-
-
-
-
-      }
-
-
-      }
-     * 
-     */
-    /*
-      private function iterative_deepening_depth_first_search($root) {
-
-
-      if(count($root) > 0){
-      $children = array();
-      foreach($root[0] as $parent){
-      $storeList = array();
-
-      $storeList = $this->getCategoriesOfCategory($parent);
-      array_push($children, $storeList);
-      }
-
-      // $this->depth = $this->depth + 1;
-      array_push($this->graph, $children);
-      $this->iterative_deepening_depth_first_search($children);
-
-      }
-      print_r($this->graph);
-      }
-
-     */
-
-    /*
-      private $openList = array();
-
-      private $closedList = array();
-
-
-      private function expandNode($currentNode){
-
-      $newNodes = $this->getCategoriesOfCategory($currentNode);
-
-      foreach($newNodes as $node){
-      if(in_array($node, $this->closedList)){
-
-      continue;
-      }
-
-
-      if(in_array($node, $this->openList))
-      {
-      continue;
-      }
-
-      //update ob besserer weg zum knoten gefunden
-      array_push($this->openList, $node);
-
-      }
-
-      }
-
-      private function iterative_deepening_depth_first_search($root) {
-
-
-      array_push($this->openList, $root);
-
-      do{
-
-      $currentNode = array_pop($this->openList);
-
-      if (in_array($currentNode, $this->main_topic_classification)){
-      echo("!!!FOUND!!! ".$currentNode. "!!!");
-      return $currentNode;
-      }
-
-
-      $this->expandNode($currentNode);
-
-
-      array_push($this->closedList, $currentNode);
-
-      }while(count($this->openList) != 0);
-
-
-      echo("end");
-      return null;
-      }
-     */
+        return $category;
+    }
 
     public function getCategoriesOfCategory($category) {
 
-        $categoryObject = explode("Category:", $category);
+
+        $category = $this->prepareTermNameForDBpedia($category);
 
         try {
-            $query = '
-                    SELECT ?x WHERE {
-                        <http://dbpedia.org/resource/Category:' . $categoryObject[1] . '>
-                        <http://www.w3.org/2004/02/skos/core#broader>
-                        ?x
-                      }
-                ';
+            $query = 'SELECT DISTINCT ?x WHERE { <http://dbpedia.org/resource/Category:' . $category . '> <http://www.w3.org/2004/02/skos/core#broader> ?x . }';
 
-            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=json";
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=xml";
 
-            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
+            $response = $this->sendExternalRequest($searchUrl);
+
+            $xmlobj = new SimpleXMLElement($response);
+
 
             $categoriesArray = array();
-            foreach ($categories['results']['bindings'] as $categoryObj) {
-                $child = $categoryObj['x']['value'];
-                $in_blacklist = false;
-                foreach ($this->blacklist_topics as $blacklist) {
+            foreach ($xmlobj->results as $obj) {
+                $array = (array) $obj;
+                if (!key_exists("result", $array)) {
+                    return null;
+                }
+                foreach ($array["result"] as $a) {
+                    $child = (string) $a->binding->uri;
 
-                    if (strpos($child, $blacklist) != 0 || strpos($child, $blacklist) != null) {
+                    if ($child == null) {
+                        $child = (string) $a->uri;
+                    }
+                    $in_blacklist = false;
 
+                    foreach ($this->blacklist_topics as $blacklist) {
+
+                        if (strpos($child, $blacklist) != 0 || strpos($child, $blacklist) != null) {
+
+                            $in_blacklist = true;
+                            break;
+                        }
+                    }
+
+                    if (in_array($child, $this->blacklist_topics)) {
                         $in_blacklist = true;
                     }
-                }
-
-                if (in_array($child, $this->blacklist_topics)) {
-                    $in_blacklist = true;
-                }
-                if (!$in_blacklist) {
-                    array_push($categoriesArray, $child);
+                    if (!$in_blacklist && !in_array($child, $this->closedList)) {
+                        array_push($categoriesArray, $child);
+                    }
                 }
             }
 
-
             return $categoriesArray;
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
+    private function googleSimilarityDistance() {
+        $url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyC8KhqZYkRXdKhaUvz67B7IGRzMjzo5lsc&cx=013707050272249182185:ldylhbskn0a&q=iPhone&alt=json";
+
+        $response = $this->sendExternalRequest($url);
+
+        $node1Result = json_decode($response);
+
+        print_r($node1Result);
+    }
+
+    private function get3LevelCategories($term, $level) {
+
+
+        try {
+            if ($level == 1) {
+                $query = "
+                SELECT DISTINCT * WHERE {
+                       <http://dbpedia.org/resource/" . $term . "> <http://purl.org/dc/terms/subject> ?a .
+                        ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  .
+                        ?b <http://www.w3.org/2004/02/skos/core#broader> ?c .
+                      }";
+            } else {
+                $query = "
+                SELECT DISTINCT * WHERE {
+                       <http://dbpedia.org/resource/Category:" . $term . ">
+                        <http://www.w3.org/2004/02/skos/core#broader> ?a .
+                        ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  .
+                        ?b <http://www.w3.org/2004/02/skos/core#broader> ?c .
+                      }";
+            }
+
+            /*
+             * ?c <http://www.w3.org/2004/02/skos/core#broader> ?d .
+              ?d <http://www.w3.org/2004/02/skos/core#broader> ?e .
+             */
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=json";
+
+            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
+            $result = array();
+
+
+            foreach ($categories['results']['bindings'] as $entry) {
+                $categoryA = $entry['a']['value'];
+                $categoryB = $entry['b']['value'];
+                $categoryC = $entry['c']['value'];
+                //$categoryD = $entry['d']['value'];
+                // $categoryE = $entry['e']['value'];
+                if (!in_array($categoryA, $result)) {
+                    array_push($result, $categoryA);
+                }
+                if (!in_array($categoryB, $result)) {
+                    array_push($result, $categoryB);
+                }
+                if (!in_array($categoryC, $result)) {
+                    array_push($result, $categoryC);
+                }
+                /* if (!in_array($categoryD, $result)) {
+                  array_push($result, $categoryD);
+                  }
+                  if (!in_array($categoryE, $result)) {
+                  array_push($result, $categoryE);
+                  }
+                 *
+                 */
+            }
+
+
+            return $result;
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
+    private function dbpediaSimilarityCheck($termA, $termB) {
+
+        $termA = $this->cleaningCategoryTerm($termA);
+
+        $termB = $this->cleaningCategoryTerm($termB);
+        if ($termA == $termB)
+            return 1;
+
+        $aLinksA = $this->get3LevelCategories($termA, 1);
+        $aLinksB = $this->get3LevelCategories($termB, 2);
+
+        $intersection = 0;
+
+        $combindedCats = array();
+        for ($i = 0; $i < count($aLinksA); $i++) {
+
+            if (in_array($aLinksA[$i], $aLinksB) && !in_array($aLinksA[$i], $combindedCats)) {
+                array_push($combindedCats, $aLinksA[$i]);
+                $intersection++;
+            }
+        }
+
+        for ($i = 0; $i < count($aLinksB); $i++) {
+
+            if (in_array($aLinksB[$i], $aLinksA) && !in_array($aLinksB[$i], $combindedCats)) {
+
+                array_push($combindedCats, $aLinksB[$i]);
+                $intersection++;
+            }
+        }
+
+        //calculate google distance inspired measure
+        $googleMeasure = null;
+
+        $a = log(count($aLinksA));
+        $b = log(count($aLinksB));
+        $ab = log($intersection);
+
+        $googleMeasure = (max($a, $b) - $ab) / ((count($aLinksA) + count($aLinksB)) - min($a, $b));
+
+
+        return $googleMeasure;
+        // return $this->normalizeGoogleMeasure($googleMeasure);
+    }
+
+    private function lookForDBpediaTerm($term) {
+        try {
+            $query = 'SELECT DISTINCT * WHERE { <http://dbpedia.org/resource/'.$term.'_(disambiguation)> <http://dbpedia.org/ontology/wikiPageDisambiguates> ?y .
+<http://dbpedia.org/resource/'.$term.'> <http://dbpedia.org/ontology/wikiPageRedirects> ?x .
+    }';
+
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query)."&format=xml";
+
+            $categories = $this->sendExternalRequest($searchUrl);
+            $result = array();
+            foreach ($categories['results']['bindings'] as $entry) {
+                $category = $entry['x']['value'];
+
+                array_push($result, $category);
+            }
+            
+            print_r($categories);
+            return $result;
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+          
+         
+    }
+
+    private function getLink($term) {
+        try {
+
+
+            $searchUrl = "https://en.wikipedia.org/w/api.php?action=query&prop=extlinks&format=xml&titles=" . $term;
+
+            print_r($searchUrl);
+            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
+            print_r($categories);
+            die();
+            $this->graph = array();
+
+            $categoriesArray = array();
+
+
+            foreach ($categories['results']['bindings'] as $entry) {
+                $category = $entry['x']['value'];
+
+                //$category = $this->cleaningTerm($category);
+
+                array_push($categoriesArray, $category);
+
+                //$array = array($category);
+                // $this->iterative_deepening_depth_first_search($array, null, $keyword);
+            }
+
+
+            die("links");
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
+    private function ownSimilarityFunctionWithCategories($termA, $termB) {
+
+        if ($termA == $termB)
+            return 1;
+
+        $aLinksA = $this->getCategoriesOfArticle($termA);
+        $aLinksB = $this->getCategoriesOfCategory($termB);
+
+
+
+        for ($i = 0; $i < 3; $i++) {
+
+            $categories = $this->getCategoriesOfCategory($aLinksA[$i]);
+
+            foreach ($categories as $category) {
+                array_push($aLinksA, $category);
+
+                $subcategories = $this->getCategoriesOfCategory($category);
+
+                foreach ($subcategories as $subcategory) {
+                    array_push($aLinksA, $subcategory);
+                }
+            }
+        }
+
+
+        for ($i = 0; $i < 3; $i++) {
+
+            $categories = $this->getCategoriesOfCategory($aLinksB[$i]);
+
+            foreach ($categories as $category) {
+                array_push($aLinksB, $category);
+
+                $subcategories = $this->getCategoriesOfCategory($category);
+
+                foreach ($subcategories as $subcategory) {
+                    array_push($aLinksB, $subcategory);
+                }
+            }
+        }
+
+
+        //we can't do anything if there are no links
+        if (count($aLinksA) == 0 || count($aLinksB) == 0)
+            return "null";
+
+
+        $intersection = 0;
+        $union = 0;
+        $indexA = 0;
+        $indexB = 0;
+
+
+        while ($indexA < count($aLinksA) || $indexB < count($aLinksB)) {
+
+            //identify which links to use (A, B, or both)
+            $useA = false;
+            $useB = false;
+
+            $linkA = null;
+            $linkB = null;
+
+            if ($indexA < count($aLinksA))
+                $linkA = $aLinksA[$indexA];
+
+            if ($indexB < count($aLinksB))
+                $linkB = $aLinksB[$indexB];
+
+
+            if ($linkA != null && $linkB != null && ($linkA == $linkB)) {
+                $useA = true;
+                $useB = true;
+                // $linkArt = new Article(wikipedia . getEnvironment(), linkA);
+                $intersection++;
+            } else {
+                if ($linkA != null && ($linkB == null || $linkA == $linkB)) {
+                    $useA = true;
+                    //$linkArt = new Article(wikipedia . getEnvironment(), linkA);
+
+                    if ($linkA == $linkB) {
+                        $intersection++;
+                    }
+                } else {
+                    $useB = true;
+                    //$linkArt = new Article(wikipedia . getEnvironment(), linkB);
+
+                    if ($linkB == $linkA) {
+                        $intersection++;
+                    }
+                }
+            }
+            $union++;
+
+            if ($useA)
+                $indexA++;
+            if ($useB)
+                $indexB++;
+        }
+
+
+        //calculate google distance inspired measure
+        $googleMeasure = null;
+
+        if ($intersection == 0) {
+            $googleMeasure = 1.0;
+        } else {
+            $a = log(count($aLinksA));
+            $b = log(count($aLinksB));
+            $ab = log($intersection);
+
+            $googleMeasure = (max($a, $b) - $ab) / ($m - min($a, $b));
+        }
+
+        print_r($googleMeasure);
+        die();
+
+        return $this->normalizeGoogleMeasure(googleMeasure);
+    }
+
+    private function normalizeGoogleMeasure($googleMeasure) {
+
+        if ($googleMeasure == null)
+            return 0;
+
+        if ($googleMeasure >= 1)
+            return 0;
+
+        return 1 - $this->normalizeGoogleMeasure($googleMeasure);
+    }
+
+    public function getCategoriesOfArticle($keyword) {
+
+        $this->cleaningCategoryTerm($keyword);
+        try {
+            $query = 'SELECT DISTINCT * WHERE {
+                <http://dbpedia.org/resource/' . $keyword . '>
+                    <http://purl.org/dc/terms/subject>
+                    ?x
+                    }';
+
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query);
+
+            $categories = json_decode($this->sendExternalRequest($searchUrl), true);
+            $result = array();
+            foreach ($categories['results']['bindings'] as $entry) {
+                $category = $entry['x']['value'];
+
+                array_push($result, $category);
+            }
+            return $result;
         } catch (SQLException $oException) {
             echo ("Caught SQLException: " . $oException->sError );
         }
@@ -534,27 +763,26 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         $this->main_topic_classification = array();
 
         try {
-            $query = '
-                    SELECT ?x WHERE {
-                        ?x
-                        <http://www.w3.org/2004/02/skos/core#broader>
-                        <http://dbpedia.org/resource/Category:Main_topic_classifications>
-                      }
-                ';
+            $query = 'SELECT DISTINCT * WHERE {
+                ?x
+                <http://www.w3.org/2004/02/skos/core#broader>
+                <http://dbpedia.org/resource/Category:Main_topic_classifications>
+                }';
 
             $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=json";
 
             $mainCategories = json_decode($this->sendExternalRequest($searchUrl), true);
 
             foreach ($mainCategories['results']['bindings'] as $mainCategory) {
-                array_push($this->main_topic_classification, $mainCategory['x']['value']);
+
+                array_push($this->main_topic_classification, urldecode($mainCategory['x']['value']));
             }
         } catch (SQLException $oException) {
             echo ("Caught SQLException: " . $oException->sError );
         }
     }
 
-    private function sendExternalRequest($url) {
+    public function sendExternalRequest($url) {
         // is curl installed?
         if (!function_exists('curl_init')) {
             die('CURL is not installed!');

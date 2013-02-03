@@ -34,14 +34,14 @@ class DatabaseClass {
 
         $this->initDBStore();
 
-       // $this->selectQuery();
+        $this->selectQuery();
     }
 
-    public function getCategories($keyword) {    
+    public function saveKeywords($keyword) {    
         
          //$this->dbpedia_database->calculateSimilarity("", "");
 
-        $this->dbpedia_database->getCategoriesOfArticleWithCategories($keyword);
+        $this->dbpedia_database->getCategories($keyword);
     }
     
    
