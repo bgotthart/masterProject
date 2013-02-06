@@ -1,75 +1,64 @@
 <?php
 
-/*for debuggin*/
+include_once("MainController.php");
+
+/* for debugging */
+
+
 unset($_SESSION['controller']);
 
 $controller = new MainController();
 
 $_SESSION['controller'] = $controller;
-    
-/*
-if(!isset($_SESSION['controller'])){
-  
+
+
+
+
+if (!isset($_SESSION['controller'])) {
+
     $controller = new MainController();
     $_SESSION['controller'] = $controller;
 
     echo("new session started!");
 }
 
-*/
+if (isset($_GET['dbpedia']) && isset($_GET['init'])) {
 
-if(isset($_GET['dbpedia'])){
+    $_SESSION['controller']->initDBpediaDump();
 
-    
-    $_SESSION['controller']->saveKeyword();
-    
-    return;
-}
-if(isset($_GET['init'])){
-    
-    //TODO Zeitkomponente
-    echo("init feed data");
-    return $_SESSION['controller']->getFeed($_GET['url']);
+} else {
+    if (isset($_GET['dbpedia'])) {
+
+        $_SESSION['controller']->saveKeyword();
+
+        return;
+    }
 }
 
 if (isset($_REQUEST['call']) && $_REQUEST['call'] == "handlingAPIRequest") {
     echo $_SESSION['controller']->handlingAPIRequests($_REQUEST['url']);
-    
+
     return;
 }
 
+/*
+ * TODO
+ * addInterestItem for explicit adding of interest term
+ */
 if (isset($_POST['function'])) {
-
-    if ($_POST['function'] == "addInterestText") {
-
-        return "TODO: addInterestText";
-        $_SESSION['controller']->insertUserQuery($data);
+    if ($_POST['function'] == "addInterestItem") {
+        //return processAction_addInterestText($_POST['item']);
     }
-    
+
     return;
 }
-
-if (isset($_GET['all']) && $_GET['all'] == "1") {
-    $_SESSION['controller']->queryReallyAll();
-}
-
-if (isset($_GET['all']) && $_GET['all'] == "2") {
-    $_SESSION['controller']->queryAllTriples();
-}
-
 
 function processAction_addInterestText($text) {
-
-    return "TODO: addInterest";
- //   $data = $_POST['interestText'];
+    return "//TODO: addInterest";
 }
 
 function processAction_printInterests() {
     return $_SESSION['controller']->printUserInterests();
-}
-
-function addURLToUserProfile() {
-    return "TODO: addURLToProfile";
 }
 
 ?>

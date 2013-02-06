@@ -11,7 +11,7 @@
       "matches": ["<all_urls>"],
       "js": ["jquery.js", "contentscript.js"],
       "all_frames": false,
-      "exclude_matches" : ["*://localhost/*"]
+      "exclude_globs" : ["*localhost*", "http://127.0.0.1/*", "http://*dbpedia.org/*"]
     }],
   "manifest_version": 2,
   "browser_action": {

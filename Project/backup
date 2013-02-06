@@ -1,0 +1,34 @@
+// foearch for categoriesOfCategories
+            
+            foreach ($xmlobj->results as $obj) {
+                $array = (array) $obj;
+                if (!key_exists("result", $array)) {
+                    return null;
+                }
+                foreach ($array["result"] as $a) {
+                    $child = (string) $a->binding->uri;
+
+                    if ($child == null) {
+                        $child = (string) $a->uri;
+                    }
+                    $in_blacklist = false;
+
+                    foreach ($this->blacklist_topics as $blacklist) {
+
+                        if (strpos($child, $blacklist) != 0 || strpos($child, $blacklist) != null) {
+
+                            $in_blacklist = true;
+                            break;
+                        }
+                    }
+
+                    if (in_array($child, $this->blacklist_topics)) {
+                        $in_blacklist = true;
+                    }
+                    if (!$in_blacklist && !in_array($child, $this->closedList)) {
+                        array_push($categoriesArray, $child);
+                    }
+                }
+              
+             
+            }

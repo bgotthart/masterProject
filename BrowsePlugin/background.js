@@ -1,20 +1,8 @@
-console.log("background");
-
-
-chrome.tabs.getSelected(null, function(tab) {
-    myFunction(tab.url);
-});
-
-function myFunction(tablink) {
-  // do stuff here
-  console.log(tablink);
-}
-
 
 function sendRequest(url){
-    console.log("sending...");
+    console.log("sending..." + url);
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost/IM/masterthesis/Project/processAction.php", true);
+    xhr.open("POST", "http://localhost/~biancagotthart/masterProject/Project/processAction.php", true);
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
   
     xhr.onreadystatechange = function (aEvt) {
@@ -22,13 +10,12 @@ function sendRequest(url){
              if (xhr.status == 200){
 
                  var jsonResponse = xhr.responseText;
-                 
-                 console.log(jsonResponse);
-                 //console.log(jsonResponse.response[0].message);
+                 console.log("resposne 1");
+                console.log(jsonResponse);
 
              }else{
                  var jsonResponse = xhr.response;
-                 
+                 console.log("resposne 2");
                  console.log(jsonResponse.response[0].message);
                  
                 chrome.browserAction.setBadgeText ( {
@@ -43,14 +30,10 @@ function sendRequest(url){
          }        
      }; 
      if(url.substring(0,4) != "http"){
-         console.log("NO HTTP " + url);
          url += "http://" + url;
-         console.log("FIXED " + url);
-
      }else{
          console.log("Working on: " + url);
      }
-     url = url + 
      xhr.send("call=handlingAPIRequest&url="+url);
 
 }
@@ -70,21 +53,17 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         // Execute some script when the page is fluly (DOM) ready
         chrome.browserAction.getBadgeText({}, function(result){
 
-            if(result != "OFF"){
-                console.log("background is on");
-
-                chrome.tabs.executeScript(null, {file:"contentscript.js"}, function(){
+            if(result != "OFF"){                
+/*                chrome.tabs.executeScript(null, {file:"contentscript.js"}, function(){
                 console.log("Callback executeScript!!");
                 
-                });
+                });*/
             }else{
                 console.log("background is off");
 
                 return;
             }
         });
-        
-        
-        
+  
     }
 });

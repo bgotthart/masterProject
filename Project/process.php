@@ -1,13 +1,13 @@
 <?php include_once("MainController.php");
 session_start(); ?>
 
-
 <?php
 
 //unset($_SESSION['controller']);
 require_once 'processAction.php';
 
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -21,9 +21,9 @@ require_once 'processAction.php';
             $(document).ready(function(){
 
 
-                 $("#addInterestForm").submit(function(e) {
-                    
-                        });
+                 
+
+
             });
 
 
@@ -34,12 +34,20 @@ require_once 'processAction.php';
             <h1>Interests of Bianca Gotthart</h1>
                 <?php
 
+                 //echo $controller->printUserInterests();
                 echo processAction_printInterests();
                 ?>
             
         </div>
         <div>
 
+            <!--
+            <form action="processAction.php" method="post" id="addInterestForm">
+                <input id="interestText" type="text" name="interestText" />
+                <input id="addInterestButton" type="submit" value="Add Interest" />
+                <input type="hidden" value="addInterestText" name="function" />
+            </form>
+            -->
         </div>
     </body>
 </html>

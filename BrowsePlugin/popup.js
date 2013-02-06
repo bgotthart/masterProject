@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var baseUrl = "http://localhost/IM/MasterThesis/masterthesis";
+var baseUrl = "http://localhost/~biancagotthart/masterProject;"
 
 jQuery(document).ready(function(){
    jQuery("#turnoff").click(function(){

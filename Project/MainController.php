@@ -3,119 +3,77 @@
 require_once('../APIs/opencalais/OpenCalais.class.php');
 require_once('../APIs/zemanta/Zemanta.class.php');
 require_once( "../APIs/alchemy/AlchemyAPI_PHP5-0.8/module/AlchemyAPI.php");
-require_once("../arc2/ARC2.php");
-require_once("../APIs/mediawiki/Wikipedia.class.php");
-
+require_once("../APIs/arc2/ARC2.php");
 require_once("Database.php");
 
-
 class MainController {
-
-    //put your code here
 
     private $userInterestst;
     private $DB_store;
 
     public function __construct() {
         $this->userInterestst = array();
-
+        
         $this->loadConfigFile();
+        
         $this->DB_store = new DatabaseClass();
 
-
-        $this->userInterestst = $this->DB_store->selectQuery();
+    }
+    
+    public function initDBpediaDump(){
+        $this->DB_store->initDBpediaDump();
     }
 
-    public function queryReallyAll() {
+    /*
+     * Handles Request of BrowserPlugin
+     * and initiiates saving Keywords and Concepts in Database
 
-        $this->DB_store->queryReallyAll();
-    }
-
-    public function queryAllTriples() {
-        $this->DB_store->queryAllTriples();
-    }
-
+     */
     public function handlingAPIRequests($url) {
-
-        //TODO call asynchrone    
-        //$responseCalais = $this->callOpenCalaisAPI($url);
         $responseZemanta = $this->callZemantaAPI($url);
-        $responseWikipedia = $this->callMediaWikipediaAPI($responseZemanta['keywords']);
 
-        $response = array();
+        $keywords = array();
+        foreach($responseZemanta['keywords'] as $keyword){
+            array_push($keywords, $keyword['name']);
+        }
+        
 
-        $response['opencalais'] = $responseCalais;
-
-        $response['zemanta'] = $responseZemanta;
-
-        $response['wikipedia'] = $responseWikipedia;
-        //return $this->insertUserQuery($response);
+        $this->DB_store->insertUserQuery($keywords);
     }
 
+    /*
+     * return the output for the user interests
+     */
     public function printUserInterests() {
+        
+        $this->userInterestst = $this->DB_store->selectQuery();
+        
         $result = "";
 
+
         foreach ($this->userInterestst as $topic) {
-            $result .= "<p>" . $topic['name'];
-            $result .= ": " . $topic['weight'] . "</p>";
-            if (isset($topic['keywords']) && $topic['keywords'] != null) {
-                $result .= "<ul>";
-
-                foreach ($topic['keywords'] as $keyword) {
-
-                    $result .= "<li>" . $keyword['name'] . "</li>";
-                }
-                $result .= "</ul>";
-            }
+            $result .= "<p>" . $topic['name']. ": ";
+            $result .= $topic['connection']."<p>";
+            
         }
         $result .= "</table>";
+        
         return $result;
     }
 
-    private function callOpenCalaisAPI($url) {
-        $config_xml = $this->loadConfigFile();
-        $apikey = (string) $config_xml->apis->opencalais->apikey;
-
-        $oc = new OpenCalais($apikey, "bgotthart");
-        $oc->outputFormat = "XML/RDF";
-        $content = file_get_contents($url);
-        $entities = $oc->parse($content);
-
-        return $entities;
-    }
-
-    private function loadConfigFile() {
-
-        return simplexml_load_file("../config/config.xml");
-    }
-
-    private function callZemantaAPI($url) {
-        $config_xml = $this->loadConfigFile();
-
-        $apikey = (string) $config_xml->apis->zemanta->apikey;
-
-        $zemanta = new Zemanta($apikey, 1, 0, 0);
-        $content = file_get_contents($url);
-        $entities = $zemanta->parse($content);
-        return $entities;
-    }
-/*
-    public function callMediaWikipediaAPI($terms) {
-        print_r($terms);
-
-        $wikiAPI = new Wikipedia();
-
-        $response = $wikiAPI->callAPIWithData($terms);
-
-        echo($response);
-    }
-*/
+    /*
+     * Only for testing
+     * Initiiates saving Keywords and Concepts in Database with get-parameter dbpedia=1
+     */
     public function saveKeyword() {
-        $keyword = "Volleyball";
+        $keywords = array(0 => "Volleyball");
 
-        $categories = $this->DB_store->saveKeywords($keyword);
+        $this->DB_store->insertUserQuery($keywords);
     }
 
+    /*
+     * Parse RSS Feed of config.xml
+     */
     function getFeed($feed_url) {
 
         $content = file_get_contents($feed_url);
@@ -131,34 +89,54 @@ class MainController {
     }
 
     /*
-      private function callAlchemyAPI($configXML, $url){
-      $apikey = (string)$configXML->apis->alchemy->apikey;
-
-      $alchemyObj = new AlchemyAPI();
-      $alchemyObj->setAPIKey($apikey);
-
-      //$content = file_get_contents("../data/example.html");
-      //$result = $alchemyObj ->URLGetCategory("http://www.cnn.com/2011/09/28/us/massachusetts-pentagon-plot-arrest/index.html?hpt=hp_t1", 'json');
-
-      $xml = $alchemyObj->URLGetCategory($url, AlchemyAPI::XML_OUTPUT_MODE);
-      $xml = new SimpleXMLElement($xml);
-      $response['categories'] = $xml->xpath("//category");
-
-      $xml = $alchemyObj->URLGetRankedNamedEntities($url);
-      $xml = new SimpleXMLElement($xml);
-      $response['entities'] = $xml->xpath("//entities");
-
-      $xml = $alchemyObj->URLGetRankedKeywords($url, AlchemyAPI::XML_OUTPUT_MODE);
-      $xml = new SimpleXMLElement($xml);
-      $response['keywords'] = $xml->xpath("//keyword");
-
-      print_r($response);
-
-      return $response;
-
-      }
-
+     * API Calls
      */
+    private function callOpenCalaisAPI($url) {
+        $config_xml = $this->loadConfigFile();
+        $apikey = (string) $config_xml->apis->opencalais->apikey;
+
+        $oc = new OpenCalais($apikey, "bgotthart");
+        $oc->outputFormat = "XML/RDF";
+        $content = file_get_contents($url);
+        $entities = $oc->parse($content);
+
+        return $entities;
+    }
+
+    private function callZemantaAPI($url) {
+        $config_xml = $this->loadConfigFile();
+
+        $apikey = (string) $config_xml->apis->zemanta->apikey;
+
+        $zemanta = new Zemanta($apikey);
+        $content = file_get_contents($url);
+        $entities = $zemanta->parse($content);
+        return $entities;
+    }
+    
+    private function callAlchemyAPI($url) {
+        $config_xml = $this->loadConfigFile();
+
+        $apikey = (string) $config_xml->apis->alchemy->apikey;
+        $alchemyObj = new AlchemyAPI();
+        $alchemyObj->setAPIKey($apikey);
+        
+        $xml = $alchemyObj->URLGetRankedNamedEntities($url, AlchemyAPI::XML_OUTPUT_MODE);
+        $xml = new SimpleXMLElement($xml);
+        $response['entities'] = $xml->xpath("//entities");
+
+        $xml = $alchemyObj->URLGetRankedKeywords($url, AlchemyAPI::XML_OUTPUT_MODE);
+        $xml = new SimpleXMLElement($xml);
+        $response['keywords'] = $xml->xpath("//keyword");
+
+        return $response;
+    }
+        
+    private function loadConfigFile() {
+
+        return simplexml_load_file("../config/config.xml");
+    }
+
 }
 
 ?>
