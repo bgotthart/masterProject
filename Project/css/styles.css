@@ -1,0 +1,30 @@
+/* 
+    Document   : styles
+    Created on : Feb 7, 2013, 3:54:20 PM
+    Author     : biancagotthart
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+#loading{
+    background:url(images/ajax-loader.gif) no-repeat top left;
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:100px;
+    height:100px;
+    
+}
+
+#left_content{
+    float:left;
+    width:50%;
+}
+#right_content{
+    float:right;
+    width:50%;
+}

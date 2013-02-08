@@ -8,19 +8,18 @@ require_once("Database.php");
 
 class MainController {
 
-    private $userInterestst;
+    private $userInterests;
     private $DB_store;
 
     public function __construct() {
-        $this->userInterestst = array();
-        
-        $this->loadConfigFile();
-        
-        $this->DB_store = new DatabaseClass();
+        $this->userInterests = array();
 
+        $this->loadConfigFile();
+
+        $this->DB_store = new DatabaseClass();
     }
-    
-    public function initDBpediaDump(){
+
+    public function initDBpediaDump() {
         $this->DB_store->initDBpediaDump();
     }
 
@@ -29,51 +28,110 @@ class MainController {
      * and initiiates saving Keywords and Concepts in Database
 
      */
+
     public function handlingAPIRequests($url) {
-        $responseZemanta = $this->callZemantaAPI($url);
+        $responseZemanta = json_decode($this->callZemantaAPI($url));
 
         $keywords = array();
-        foreach($responseZemanta['keywords'] as $keyword){
+        foreach ($responseZemanta['keywords'] as $keyword) {
             array_push($keywords, $keyword['name']);
         }
-        
 
-        $this->DB_store->insertUserQuery($keywords);
+
+        return $this->DB_store->insertUserQuery($keywords);
     }
 
     /*
      * return the output for the user interests
      */
-    public function printUserInterests() {
-        
-        $this->userInterestst = $this->DB_store->selectQuery();
-        
-        $result = "";
 
+    public function printAllUserInterests() {
 
-        foreach ($this->userInterestst as $topic) {
-            $result .= "<p>" . $topic['name']. ": ";
-            $result .= $topic['connection']."<p>";
+      
+        $this->userInterests = $this->DB_store->selectAllQuery();
+        
+        $result = "<ul>";
+
+        
+        foreach ($this->userInterests as $topic) {
+            $result .= "<li>" . $topic['name'];;
+            
+            if(isset($topic['connections'])){
+                $result .=  "<ul> ";
+                foreach($topic['connections'] as $connection){
+                    $result .= "<li>". $connection['connectionName']."</li> ";
+                    //$result .= $connection['connectionWeight']."</li>";
+                }
+                $result .= "</ul></li>";
+            }else{
+                $result .= "</li>";
+            }
+            
             
         }
-        $result .= "</table>";
+        $result .= "</ul>";
         
         return $result;
     }
+    public function printUserInterests() {
 
-    /*
-     * Only for testing
-     * Initiiates saving Keywords and Concepts in Database with get-parameter dbpedia=1
-     */
-    public function saveKeyword() {
-        $keywords = array(0 => "Volleyball");
+      
+        $this->userInterests = $this->DB_store->selectQuery();
+        
+        $result = "<ul>";
 
-        $this->DB_store->insertUserQuery($keywords);
+        
+        foreach ($this->userInterests as $topic) {
+            $result .= "<li>" .$topic['name'];
+            if(isset($topic['weight'])){
+                //$result .= ': '.$topic['weight'];
+            }
+            
+            
+            $result .= "</li>";
+            
+    
+        }
+        $result .= "</ul>";
+        
+        return $result;
+    }
+    
+    public function saveKeywords($keywords) {
+        
+        if(is_array($keywords)){
+            $extracted = explode(",", $keywords);
+        
+            $extracted = array($extracted[1]);
+        }else{
+            $extracted = array($keywords);
+        }
+        
+        
+      
+        if(count($extracted) > 0 || strlen($extracted) > 0){
+            $extractedResponse = $this->DB_store->insertUserQuery($extracted);
+            //$this->userInterests = $this->DB_store->selectQuery();
+        }else{
+            $extractedResponse = '{"response": [{ "status": 400, "function":"insertUserQuery" , "message":"ERROR: Entities NOT added to User Profile" }]}';
+        }
+
+        $response = json_decode($extractedResponse, true);
+        
+        
+        if($response['response'][0]['status'] == 400 || $response['response'][0]['status'] == '400'){
+            return $extractedResponse;
+        }else{
+            return json_encode($response['response'][0]);
+        }
+        
+
     }
 
     /*
      * Parse RSS Feed of config.xml
      */
+
     function getFeed($feed_url) {
 
         $content = file_get_contents($feed_url);
@@ -91,7 +149,9 @@ class MainController {
     /*
      * API Calls
      */
+
     private function callOpenCalaisAPI($url) {
+        $url = urlencode($url);
         $config_xml = $this->loadConfigFile();
         $apikey = (string) $config_xml->apis->opencalais->apikey;
 
@@ -103,7 +163,8 @@ class MainController {
         return $entities;
     }
 
-    private function callZemantaAPI($url) {
+    public function callZemantaAPI($url) {
+
         $config_xml = $this->loadConfigFile();
 
         $apikey = (string) $config_xml->apis->zemanta->apikey;
@@ -111,16 +172,18 @@ class MainController {
         $zemanta = new Zemanta($apikey);
         $content = file_get_contents($url);
         $entities = $zemanta->parse($content);
-        return $entities;
+        
+
+        return json_encode($entities);
     }
-    
+
     private function callAlchemyAPI($url) {
         $config_xml = $this->loadConfigFile();
 
         $apikey = (string) $config_xml->apis->alchemy->apikey;
         $alchemyObj = new AlchemyAPI();
         $alchemyObj->setAPIKey($apikey);
-        
+
         $xml = $alchemyObj->URLGetRankedNamedEntities($url, AlchemyAPI::XML_OUTPUT_MODE);
         $xml = new SimpleXMLElement($xml);
         $response['entities'] = $xml->xpath("//entities");
@@ -131,12 +194,19 @@ class MainController {
 
         return $response;
     }
-        
+
     private function loadConfigFile() {
 
         return simplexml_load_file("../config/config.xml");
     }
-
+    public function update(){
+        $this->DB_store->updateUserQuery();
+    }
+    public function delete(){
+        $this->DB_store->deleteUserQuery();
+    }
 }
+
+
 
 ?>

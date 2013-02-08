@@ -6,8 +6,8 @@ and open the template in the editor.
 
 
 <root>
-    <baseURL>http://localhost/IM/masterthesis</baseURL>
-    <fileBaseURL>file:///Applications/XAMPP/xamppfiles/htdocs/IM/masterThesis</fileBaseURL>
+    <baseURL>http://localhost/~biancagotthart/masterProject</baseURL>
+    <fileBaseURL>file:///users/biancagotthart/Sites/masterProject</fileBaseURL>
      <database>
         <db_host>localhost</db_host>
         <db_name>masterproject</db_name>

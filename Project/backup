@@ -32,3 +32,18 @@
               
              
             }
+
+
+
+
+       /*
+          $googleMeasure1 = (max($a, $b) - $ab) / ($union - min($a, $b));
+          $googleMeasure11 = 1-((max($a, $b) - $ab) / ($union - min($a, $b)));
+
+          $googleMeasure2 = (max($a, $b) - $ab) / (29380711 - min($a, $b));
+          $googleMeasure = 1 - ((max($a, $b) - $ab) / (29380711 - min($a, $b)));
+
+          $googleMeasure3 = ($union - count($combindedCats)) / $union;
+
+          $googleMeasure31 = 1 - (($union - count($combindedCats)) / $union);
+         */

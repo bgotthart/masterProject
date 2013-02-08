@@ -19,7 +19,7 @@ class Zemanta {
     private $fetchArticles;
     private $fetchCategories;
     private $fetchRDFLinks;
-    public function __construct($api_key, $fetchCategories = 1, $fetchImages = 0, $fetchArticles = 0, $fetchRDFLinks = 0) {
+    public function __construct($api_key, $fetchCategories = 0, $fetchImages = 0, $fetchArticles = 0, $fetchRDFLinks = 0) {
             $this->api_key = $api_key;
             $this->fetchArticles = $fetchArticles;
             $this->fetchCategories = $fetchCategories;
@@ -37,7 +37,7 @@ class Zemanta {
                 'return_images' => $this->fetchImages,
                 'return_articles' => $this->fetchArticles,
                 'return_categories' => $this->fetchCategories
-            );
+                );
 
             /* Here we build the data we want to POST to Zementa */
             $data = "";
@@ -80,22 +80,21 @@ class Zemanta {
         $keywords = array();
         foreach ($tmpKeywords as $item) {
             $itemArray = (array)$item;
-            if($itemArray['confidence'] > 0.09){
+            if($itemArray['confidence'] > 0.07){
                 array_push($keywords, (array)$item);
             }
             
         }
         
-
         $responseArray['keywords'] = $keywords;
-
+/*
         $tmpCats = (array)$xml->xpath("//categories");
         $categories = array();
         foreach ($tmpCats as $item) {
             array_push($categories, (array)$item);
         }
         $responseArray['categories'] = $categories;
-
+*/
         return $responseArray;
     }
     

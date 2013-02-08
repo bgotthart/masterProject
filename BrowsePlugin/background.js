@@ -54,10 +54,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         chrome.browserAction.getBadgeText({}, function(result){
 
             if(result != "OFF"){                
-/*                chrome.tabs.executeScript(null, {file:"contentscript.js"}, function(){
-                console.log("Callback executeScript!!");
-                
-                });*/
+                return;
             }else{
                 console.log("background is off");
 
