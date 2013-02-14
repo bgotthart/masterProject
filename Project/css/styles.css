@@ -28,3 +28,7 @@ root {
     float:right;
     width:50%;
 }
+
+form{
+    margin:40px; 0;
+}

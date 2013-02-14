@@ -99,17 +99,11 @@ class MainController {
     
     public function saveKeywords($keywords) {
         
-        if(is_array($keywords)){
-            $extracted = explode(",", $keywords);
-        
-            $extracted = array($extracted[1]);
-        }else{
-            $extracted = array($keywords);
-        }
-        
-        
+        $extracted = explode(", ", $keywords);
+
       
         if(count($extracted) > 0 || strlen($extracted) > 0){
+            
             $extractedResponse = $this->DB_store->insertUserQuery($extracted);
             //$this->userInterests = $this->DB_store->selectQuery();
         }else{

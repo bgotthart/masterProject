@@ -42,20 +42,21 @@ class DatabaseClass {
 
 
         $insert = ' DELETE  {
-                   <http://dbpedia.org/resource/Category:Video_game_platforms> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual> ;
+                   <http://dbpedia.org/resource/Category:History_of_technology> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual> ;
                     <http://www.example.org#hasName> ?name .
                    }';
-                    
-        
+
+
         $result = $this->arc_store->query($insert, '', '', true);
         if ($errs = $this->arc_store->getErrors()) {
             echo("error");
             print_r($errs);
             $errors = true;
         }
-        
+
         //print_r($this->selectQuery());
     }
+
     public function updateUserQuery() {
 
         $config_xml = $this->loadConfigFile();
@@ -63,8 +64,8 @@ class DatabaseClass {
         $insert = ' INSERT DATA {
                    <http://dbpedia.org/resource/Sport> <http://www.example.org#hasWeight> 100 .
                    }';
-                    
-        
+
+
         $result = $this->arc_store->query($insert, '', '', true);
         if ($errs = $this->arc_store->getErrors()) {
             echo("error");
@@ -73,7 +74,7 @@ class DatabaseClass {
         }
         echo("test");
         print_r($result);
-       // print_r($this->selectAllQuery());
+        // print_r($this->selectAllQuery());
     }
 
     public function insertUserQuery($keywords) {
@@ -85,14 +86,30 @@ class DatabaseClass {
 
         $config_xml = $this->loadConfigFile();
 
-        
-        $resultJson = '"results": [';
-        foreach ($saveConcepts as $concepts) {
-            $last = end($concepts);
 
-            foreach ($concepts as $data) {
-                
-                
+        $resultJson = '"results": [{';
+        $lastConcept = end($saveConcepts);
+        foreach ($saveConcepts as $key => $value) {
+            
+            $last = end($value);
+            
+            if (strstr($key, 'Category:') !== false) {
+                $termArray = explode("Category:", $key);
+                $identifier = $termArray[1];
+            } else if (strstr($key, 'resource/') !== false) {
+                $termArray = explode("resource/", $key);
+                $identifier = $termArray[1];
+            } else if (strstr($key, 'page/') !== false) {
+                $termArray = explode("page/", $key);
+                $identifier = $termArray[1];
+            } else {
+                $identifier = $key;
+            }
+
+            $resultJson .= '"' . $identifier . '": [';
+            foreach ($value as $data) {
+
+
                 $name = '';
                 if (strstr($data, 'Category:') !== false) {
                     $termArray = explode("Category:", $data);
@@ -107,14 +124,14 @@ class DatabaseClass {
                     $name = $data;
                 }
 
-                
+
 
                 $stringName = $this->dbpedia_database->prepareName($name);
 
-                if($last == $data){
-                    $resultJson .= '{"name": "'.$stringName . '"}';
-                }else{
-                    $resultJson .= '{"name": "'.$stringName . '"},';
+                if ($last == $data) {
+                    $resultJson .= '{"name": "' . $stringName . '"}';
+                } else {
+                    $resultJson .= '{"name": "' . $stringName . '"},';
                 }
                 $insert = ' INSERT INTO <' . $config_xml->fileBaseURL . '/config/Profile_v1.owl> {
                   <' . $data . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual>;
@@ -123,9 +140,9 @@ class DatabaseClass {
                   <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#Concept> ;';
 
 
-                $lastElement = end($concepts);
+                $lastElement = end($value);
 
-                foreach ($concepts as $data2) {
+                foreach ($value as $data2) {
 
                     if ($data2 != $data) {
                         if ($data != $data2) {
@@ -146,14 +163,22 @@ class DatabaseClass {
                     print_r($errs);
                     $errors = true;
                 }
+            
+               // $resultJson .= "}";
             }
-            $resultJson .= "]";
- 
+            
+            if($lastConcept == $value){
+                $resultJson .= "]";
+            }else{
+                $resultJson .= "],";
+            }
+            
         }
 
-
+        $resultJson .= "}]";
+        
         if (!$errors) {
-            return '{"response": [{ "status": 200, "function":"insertUserQuery" ,"message":"Entities are successfully added to User Profile", '. $resultJson.'}]}';
+            return '{"response": [{ "status": 200, "function":"insertUserQuery" ,"message":"Entities are successfully added to User Profile", ' . $resultJson . '}]}';
         } else {
             return '{"response": [{ "status": 400, "function":"insertUserQuery" , "message":"ERROR: Entities NOT added to User Profile" }]}';
         }
@@ -188,13 +213,13 @@ class DatabaseClass {
                 if (isset($row['name'])) {
                     $topics[$row['concept']]['name'] = $row['name'];
                     $topics[$row['concept']]['uri'] = $row['concept'];
-                   
+
                     $topics[$row['concept']]['weight'] = $row['weight'];
                 }
 
                 $concept = $row['concept'];
                 $name = $row['name'];
-                
+
 
                 $q = self::PREFIX_EX . ' ' .
                         self::PREFIX_OX . ' ' .
@@ -244,7 +269,6 @@ class DatabaseClass {
                             $connection['connectionWeight'] = $connection['connectionWeight'];
                             array_push($connections, $connection);
                         }
-
                     }
                     $topics[$row['concept']]['connections'] = $connections;
                 }
@@ -253,9 +277,10 @@ class DatabaseClass {
             echo '{"response": [{ status: 200, "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
         }
 
-        
+
         return $topics;
     }
+
     public function selectAllQuery() {
 
 

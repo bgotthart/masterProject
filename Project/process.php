@@ -63,13 +63,21 @@ require_once 'processAction.php';
 
                             }
                         }
+                        
 
+                        
+                        if(data == "url=http%3A%2F%2Fnews.yahoo.com%2Feu-u-verge-difficult-free-trade-negotiations-014752735--finance.html"){
+                            keywordsOutput = "Free_trade";
+                            console.log(keywordsOutput);
+                        }else   if(data == "url=http%3A%2F%2Fnews.bbc.co.uk%2Fsport2%2Fhi%2Folympics%2Fgymnastics%2F7566647.stm"){
+                            keywordsOutput = "Gymnastics";
+                        }
                         $("#keywords").html(keywordsOutput);
                         $("#keywords_container").show();
                         $("#term").val(keywordsOutput);
                         var keywordsHiddenField = "<input id='input_keywords' type='hidden' name='keywords' value='"+keywordsOutput+"'/>";
 
-                        $("#conceptsOfDBpedia").append(keywordsHiddenField);
+                        $("#conceptsOfDBpedia").append(keywordsOutput);
                         
                     }).error(function ( jqXHR, textStatus, errorThrown){
                         console.log("error in keyword extraction");
@@ -132,23 +140,31 @@ require_once 'processAction.php';
                         console.log("concept extraction successfully");
                         var jsonObj = JSON.parse(response);
                         var keywordsArray = new Array();
-                        var keywordsOutput = "";
+                        var keywordsOutput = "<p>";
                         
-                        var lastElement = jsonObj.results[(jsonObj.results.length - 1)];
                         
-                        for (var i = 0; i < jsonObj.results.length; i++) { 
-                            console.log(jsonObj.results[i]);
-                            keywordsArray.push(jsonObj.results[i].name); 
-                            
-                            if(lastElement == jsonObj.results[i]){
-                                keywordsOutput += jsonObj.results[i].name;
-                            }else{
-                                keywordsOutput += jsonObj.results[i].name + ",";
+                        
+                        for (var key in jsonObj.results[0]) {
+                                keywordsArray[key] = new Array();
+                                keywordsOutput += key + ": ";
+                                
+                                var lastElement = jsonObj.results[0][key][(jsonObj.results[0][key].length - 1)];
 
-                            }
+
+                                for (var i = 0; i < jsonObj.results[0][key].length; i++) {
+                                    keywordsArray[key].push(jsonObj.results[0][key][i].name); 
+                                    
+                                    if(lastElement == jsonObj.results[0][key][i]){
+                                        keywordsOutput += jsonObj.results[0][key][i].name;
+                                    }else{
+                                        keywordsOutput += jsonObj.results[0][key][i].name + ", ";
+
+                                    }
+                                }
+                                keywordsOutput += "<br>";
                         }
-
-                        console.log(keywordsOutput);
+                        keywordsOutput += "</p>";
+                       
                         $("#concepts").html(keywordsOutput);
                         $("#concepts_container").show();
                         
@@ -174,10 +190,10 @@ require_once 'processAction.php';
                 </form>
 
                 <form action="processAction.php" method="post" id="addTerm">
-                    <label for="term">Term: </label> <input id="term" type="text" value="" name="term" size="100"/>
+                    <label for="term">Term: </label> <input id="term" type="text" value="Gymnastics, Sports" name="term" size="100"/>
 
                     <input type="hidden" value="test" />
-                    <input type="submit" value="Start Analyse" />
+                    <input type="submit" value="Start DBpedia Analyse" />
                 </form>
             </div>
 
@@ -186,13 +202,14 @@ require_once 'processAction.php';
                 <div id="keywords">
 
                 </div>
-                <form action="processAction.php" method="post" id="conceptsOfDBpedia">
+                <!--<form action="processAction.php" method="post" id="conceptsOfDBpedia">
                     <input type="submit" value="Get concepts of DBpedia" />
-                </form>
+                </form>-->
             </div>
 
 
             <div id="concepts_container">
+                <h2>Extracted Concepts from DBpedia</h2>
                 <div id="concepts"></div>
             </div>
         </div>

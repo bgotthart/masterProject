@@ -23,6 +23,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     private $wikipediaAPI;
     private $openList;
     private $closedList;
+    private $categoriesOfKeyword; 
     
     public function __construct() {
         $this->initMainTopicClassification();
@@ -95,17 +96,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     private function lookForDBpediaTerm($term) {
         $term = $this->prepareTermNameForDBpedia($term);
         try {
-            $query = 'SELECT DISTINCT * WHERE { { { <http://dbpedia.org/resource/' . $term . '_(disambiguation)> <http://dbpedia.org/ontology/wikiPageRedirects> ?y . }
-                UNION
-                {
-                <http://dbpedia.org/resource/' . $term . '_(disambiguation)> <http://dbpedia.org/ontology/wikiPageDisambiguates> ?x . }
-                }
-                UNION{
-                    <http://dbpedia.org/resource/Android> <http://dbpedia.org/ontology/wikiPageRedirects> ?z .
-                    }
-                    }';
-
-            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=xml";
+            //
+            
+            $searchUrl = "http://en.wikipedia.org/w/api.php?action=query&list=search&format=xml&srsearch=".urlencode($term);
 
             $response = $this->sendExternalRequest($searchUrl);
 
@@ -131,10 +124,12 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     }
 
     public function getCategoriesForKeyword($keyword) {
-        
-        
+                
         $keywordConcept = '';
      
+        $this->graph = array();
+        $this->categoriesOfKeyword = $this->get3LevelCategories($keyword, 1);
+        
         /* Only for debuggin*/
         $keywordConcept = "http://dbpedia.org/resource/".$keyword;
         
@@ -250,6 +245,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                     $children = array_values($this->openList);
                     $bestNode = $this->getBestNode($keyword, $children);
 
+                    if($bestNode == null){
+                        return $this->graph;
+                    }
                     $this->addToGraph($node);
                     $this->iterative_search_for_categories($bestNode, $keyword);
                 } else {
@@ -264,6 +262,10 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                 $children = array_values($this->openList);
                 $bestNode = $this->getBestNode($keyword, $children);
 
+                if($bestNode == null){
+                        return $this->graph;
+                    }
+                
                 $this->addToGraph($bestNode);
 
                 $this->iterative_search_for_categories($bestNode, $keyword);
@@ -340,9 +342,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             } else {
                 $query = "
                 SELECT DISTINCT * WHERE { <http://dbpedia.org/resource/Category:" . $term . "> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
-                    ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . 
-                    ?b <http://www.w3.org/2004/02/skos/core#broader> ?c . 
-                     ?c <http://www.w3.org/2004/02/skos/core#broader> ?d .
+                    OPTIONAL { ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }
+                    OPTIONAL { ?b <http://www.w3.org/2004/02/skos/core#broader> ?c . }
+                     OPTIONAL { ?c <http://www.w3.org/2004/02/skos/core#broader> ?d . }
                     }";
             }
             $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query);
@@ -417,36 +419,36 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     
     private function dbpediaSimilarityCheck($termA, $termB) {
 
-        $termA = $this->cleaningCategoryTerm($termA);
+        //$termA = $this->cleaningCategoryTerm($termA);
 
         $termB = $this->cleaningCategoryTerm($termB);
 
         if ($termA == $termB)
             return 1;
 
-        $aLinksA = $this->get3LevelCategories($termA, 1);
+        //$aLinksA = $this->get3LevelCategories($termA, 1);
         
         $aLinksB = $this->get3LevelCategories($termB, 2);
         
         
-        if(count($aLinksB) == 0){
+        if(count($this->categoriesOfKeyword) == 0){
             array_push($this->closedList, $termB);
             return;
         }
         $intersection = 0;
 
         $combindedCats = array();
-        for ($i = 0; $i < count($aLinksA); $i++) {
+        for ($i = 0; $i < count($this->categoriesOfKeyword); $i++) {
 
-            if (in_array($aLinksA[$i], $aLinksB) && !in_array($aLinksA[$i], $combindedCats)) {
-                array_push($combindedCats, $aLinksA[$i]);
+            if (isset($aLinksB) && in_array($this->categoriesOfKeyword[$i], $aLinksB) && !in_array($this->categoriesOfKeyword[$i], $combindedCats)) {
+                array_push($combindedCats, $this->categoriesOfKeyword[$i]);
                 $intersection++;
             }
         }
 
         for ($i = 0; $i < count($aLinksB); $i++) {
 
-            if (in_array($aLinksB[$i], $aLinksA) && !in_array($aLinksB[$i], $combindedCats)) {
+            if (isset($aLinksB) && in_array($aLinksB[$i], $this->categoriesOfKeyword) && !in_array($aLinksB[$i], $combindedCats)) {
 
                 array_push($combindedCats, $aLinksB[$i]);
                 $intersection++;
@@ -461,10 +463,10 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
         //calculate google distance inspired measure
         $googleMeasure = 0.0;
-        $union = (count($aLinksA) + count($aLinksB));
+        $union = (count($this->categoriesOfKeyword) + count($aLinksB));
 
 
-        $a = log(count($aLinksA));
+        $a = log(count($this->categoriesOfKeyword));
         $b = log(count($aLinksB));
         $ab = log($intersection);
  
@@ -495,6 +497,8 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
                 array_push($this->main_topic_classification, urldecode($mainCategory['x']['value']));
             }
+            
+            //print_r($this->main_topic_classification);
         } catch (SQLException $oException) {
             echo ("Caught SQLException: " . $oException->sError );
         }
@@ -553,6 +557,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         curl_setopt($ch, CURLOPT_URL, $url);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
 
         $response = curl_exec($ch);
 

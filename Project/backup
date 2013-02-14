@@ -1,3 +1,43 @@
+//disambiguation
+private function lookForDBpediaTerm($term) {
+        $term = $this->prepareTermNameForDBpedia($term);
+        try {
+            //http://en.wikipedia.org/w/api.php?action=query&list=search&format=xmlfm&srsearch=IOS
+            $query = 'SELECT DISTINCT * WHERE { { { <http://dbpedia.org/resource/' . $term . '_(disambiguation)> <http://dbpedia.org/ontology/wikiPageRedirects> ?y . }
+                UNION
+                {
+                <http://dbpedia.org/resource/' . $term . '_(disambiguation)> <http://dbpedia.org/ontology/wikiPageDisambiguates> ?x . }
+                }
+                UNION{
+                    <http://dbpedia.org/resource/Android> <http://dbpedia.org/ontology/wikiPageRedirects> ?z .
+                    }
+                    }';
+
+            $searchUrl = "http://dbpedia.org/sparql?query=" . urlencode($query) . "&format=xml";
+
+            $response = $this->sendExternalRequest($searchUrl);
+
+            $xmlobj = new SimpleXMLElement($response);
+
+
+            $result = array();
+            foreach ($xmlobj->results as $obj) {
+                $array = (array) $obj;
+                if (!key_exists("result", $array)) {
+                    return null;
+                }
+                foreach ($array["result"] as $a) {
+                    $child = (string) $a->uri;
+                    array_push($result, $child);
+                }
+            }
+
+            return $result[0];
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }
+
 // foearch for categoriesOfCategories
             
             foreach ($xmlobj->results as $obj) {
