@@ -1,0 +1,329 @@
+\begin{thebibliography}{10}
+
+\bibitem{backett_rdf/xml_2004}
+Dave Backett and Brian {McBride}.
+\newblock {RDF/XML} syntax specification.
+\newblock {www.w3.org/TR/rdf-syntax-grammar/}, 2004.
+
+\bibitem{berners-lee_linked_2006}
+Tim Berners-Lee.
+\newblock Linked data.
+\newblock {http://www.w3.org/DesignIssues/LinkedData.html}, 2006.
+
+\bibitem{bouzid_survey_2012}
+S.~Bouzid, C.~Cauvet, and J.~Pinaton.
+\newblock A survey of semantic web standards to representing knowledge in
+  problem solving situations.
+\newblock In {\em 2012 International Conference on Information Retrieval
+  Knowledge Management ({CAMP)}}, pages 121 --125, March 2012.
+
+\bibitem{bouzid_survey_2012-1}
+S.~Bouzid, C.~Cauvet, and J.~Pinaton.
+\newblock A survey of semantic web standards to representing knowledge in
+  problem solving situations.
+\newblock In {\em 2012 International Conference on Information Retrieval
+  Knowledge Management ({CAMP)}}, pages 121 --125, March 2012.
+
+\bibitem{brickley_friend_2010}
+Dan Brickley and Libby Miller.
+\newblock The friend of a friend ({FOAF)} vocabulary specification.
+\newblock http://xmlns.com/foaf/spec/, August 2010.
+
+\bibitem{brickley_weighted_2010}
+Dan Brickley, Libby Miller, Toby Inkster, Yi~Zeng, Yan Wang, Danica
+  Damljanovic, Zhisheng Huang, Sheila Kinsella, John Breslin, and Bob Ferris.
+\newblock The weighted interests vocabulary 0.5.
+\newblock http://smiy.sourceforge.net/wi/spec/weightedinterests.html, September
+  2010.
+
+\bibitem{center_for_history_and_new_media_zotero_????}
+{Center for History and New Media}.
+\newblock Zotero quick start guide.
+\newblock http://zotero.org/support/quick\_start\_guide.
+
+\bibitem{chan_non-invasive_1999}
+Philip~K. Chan.
+\newblock {\em A Non-Invasive Learning Approach to Building Web User Profiles}.
+\newblock test, 1999.
+
+\bibitem{chirita_using_2005}
+Paul~Alexandru Chirita, Wolfgang Nejdl, Raluca Paiu, and Christian
+  Kohlschütter.
+\newblock Using {ODP} metadata to personalize search.
+\newblock In {\em Proceedings of the 28th annual international {ACM} {SIGIR}
+  conference on Research and development in information retrieval}, {SIGIR}
+  '05, page 178–185, New York, {NY}, {USA}, 2005. {ACM}.
+
+\bibitem{cilibrasi_google_2007}
+{R.L.} Cilibrasi and {P.M.B.} Vitanyi.
+\newblock The google similarity distance.
+\newblock {\em {IEEE} Transactions on Knowledge and Data Engineering},
+  19(3):370 --383, March 2007.
+
+\bibitem{cilibrasi_google_2007-1}
+{R.L.} Cilibrasi and {P.M.B.} Vitanyi.
+\newblock The google similarity distance.
+\newblock {\em {IEEE} Transactions on Knowledge and Data Engineering},
+  19(3):370 --383, March 2007.
+
+\bibitem{ding_using_2007}
+Li~Ding, Pranam Kolari, Zhongli Ding, and Sasikanth Avancha.
+\newblock Using ontologies in the semantic web: A survey.
+\newblock In Raj Sharman, Rajiv Kishore, and Ram Ramesh, editors, {\em
+  Ontologies}, number~14 in Integrated Series in Information Systems, pages
+  79--113. Springer {US}, January 2007.
+
+\bibitem{dotsika_semantic_2010}
+Fefie Dotsika.
+\newblock Semantic {APIs:} scaling up towards the semantic web.
+\newblock {\em Int. J. Inf. Manag.}, 30(4):335–342, August 2010.
+
+\bibitem{gauch_ontology-based_2003}
+Susan Gauch, Jason Chaffee, and Alexander Pretschner.
+\newblock Ontology-based personalized search and browsing.
+\newblock {\em Web Intelligence and Agent Systems}, 1:1–3, 2003.
+
+\bibitem{godoy_user_2005}
+D.~Godoy and A.~Amandi.
+\newblock User profiling for web page filtering.
+\newblock {\em {IEEE} Internet Computing}, 9(4):56 -- 64, August 2005.
+
+\bibitem{grcar_user_2005}
+M~Grcar, D~Mladenic, and M~Grobelnik.
+\newblock User profiling for interest-focused browsing history.
+\newblock 2005.
+
+\bibitem{hella_personalisation_2011}
+Lillian Hella and John Krogstie.
+\newblock Personalisation by semantic web technology in food shopping.
+\newblock In {\em Proceedings of the International Conference on Web
+  Intelligence, Mining and Semantics}, {WIMS} '11, page 34:1–34:12, New York,
+  {NY}, {USA}, 2011. {ACM}.
+
+\bibitem{jayanthi_generation_2011}
+J.~Jayanthi, {K.S.} Jayakumar, and S.~Surendran.
+\newblock Generation of ontology based user profiles for personalized web
+  search.
+\newblock In {\em 2011 3rd International Conference on Electronics Computer
+  Technology ({ICECT)}}, volume~6, pages 240 --244, April 2011.
+
+\bibitem{jun_application_2008}
+Zhai Jun, Wang Qinglian, and Lv~Miao.
+\newblock Application of {XML} topic maps to knowledge navigation and
+  information retrieval for urban traffic information portal.
+\newblock In {\em Control Conference, 2008. {CCC} 2008. 27th Chinese}, pages
+  458 --462, July 2008.
+
+\bibitem{kim_learning_2003}
+Hyoung~R. Kim and Philip~K. Chan.
+\newblock Learning implicit user interest hierarchy for context in
+  personalization.
+\newblock In {\em Proceedings of the 8th international conference on
+  Intelligent user interfaces}, {IUI} '03, page 101–108, New York, {NY},
+  {USA}, 2003. {ACM}.
+
+\bibitem{lee_ontology-based_2005}
+Chen-Yu Lee and Von-Wun Soo.
+\newblock Ontology-based information retrieval and extraction.
+\newblock In {\em 3rd International Conference on Information Technology:
+  Research and Education, 2005. {ITRE} 2005}, pages 265 -- 269, June 2005.
+
+\bibitem{lee_ontology-based_2005-1}
+Chen-Yu Lee and Von-Wun Soo.
+\newblock Ontology-based information retrieval and extraction.
+\newblock In {\em 3rd International Conference on Information Technology:
+  Research and Education, 2005. {ITRE} 2005}, pages 265 -- 269, June 2005.
+
+\bibitem{marchiori_towards_2004}
+Massimo Marchiori.
+\newblock Towards a people's web: Metalog.
+\newblock In {\em Proceedings of the 2004 {IEEE/WIC/ACM} International
+  Conference on Web Intelligence}, {WI} '04, page 320–326, Washington, {DC},
+  {USA}, 2004. {IEEE} Computer Society.
+
+\bibitem{middleton_ontological_2004}
+Stuart~E. Middleton, Nigel~R. Shadbolt, and David~C. De~Roure.
+\newblock Ontological user profiling in recommender systems.
+\newblock {\em {ACM} Trans. Inf. Syst.}, 22(1):54–88, January 2004.
+
+\bibitem{middleton_ontological_2004-1}
+Stuart~E. Middleton, Nigel~R. Shadbolt, and David~C. De~Roure.
+\newblock Ontological user profiling in recommender systems.
+\newblock {\em {ACM} Trans. Inf. Syst.}, 22(1):54–88, January 2004.
+
+\bibitem{mihalcea_wikify!:_2007}
+Rada Mihalcea and Andras Csomai.
+\newblock Wikify!: linking documents to encyclopedic knowledge.
+\newblock In {\em Proceedings of the sixteenth {ACM} conference on Conference
+  on information and knowledge management}, {CIKM} '07, page 233–242, New
+  York, {NY}, {USA}, 2007. {ACM}.
+
+\bibitem{milne_open-source_????-1}
+David Milne.
+\newblock An open-source toolkit for mining wikipedia.
+\newblock In {\em In Proc. New Zealand Computer Science Research Student Conf},
+  page 2009.
+
+\bibitem{milne_open-source_2009}
+David Milne.
+\newblock An open-source toolkit for mining wikipedia.
+\newblock In {\em In Proc. New Zealand Computer Science Research Student Conf},
+  2009.
+
+\bibitem{min_building_2011}
+Jinmin Min and Gareth~{J.F.} Jones.
+\newblock Building user interest profiles from wikipedia clusters.
+\newblock July 2011.
+
+\bibitem{nakatsuji_expanding_2007}
+Makoto Nakatsuji, Makoto Yoshida, and Miki Hirano.
+\newblock Expanding user interests by recommending innovative blog entries,
+  2007.
+
+\bibitem{nakatsuji_detecting_2009}
+Makoto Nakatsuji, Makoto Yoshida, and Toru Ishida.
+\newblock Detecting innovative topics based on user-interest ontology.
+\newblock {\em Web Semant.}, 7(2):107–120, April 2009.
+
+\bibitem{nigro_data_2007}
+Hector~Oscar Nigro, Sandra~Elizabeth Gonzalez~Cisaro, and Daniel~Hugo Xodo,
+  editors.
+\newblock {\em Data Mining with Ontologies}.
+\newblock {IGI} Global, July 2007.
+
+\bibitem{pepper_topic_2009}
+S.~Pepper.
+\newblock Topic maps, 2009.
+
+\bibitem{ponzetto_deriving_2007}
+Simone~Paolo Ponzetto and Michael Strube.
+\newblock Deriving a large scale taxonomy from wikipedia.
+\newblock In {\em Proceedings of the 22nd national conference on Artificial
+  intelligence - Volume 2}, {AAAI'07}, page 1440–1445. {AAAI} Press, 2007.
+
+\bibitem{pretschner_ontology_1999}
+Alexander Pretschner and Susan Gauch.
+\newblock Ontology based personalized search.
+\newblock page 391–398, 1999.
+
+\bibitem{ramanathan_creating_2009}
+Krishnan Ramanathan and Komal Kapoor.
+\newblock Creating user profiles using wikipedia.
+\newblock In {\em Proceedings of the 28th International Conference on
+  Conceptual Modeling}, {ER} '09, page 415–427, Berlin, Heidelberg, 2009.
+  Springer-Verlag.
+
+\bibitem{sendhilkumar_personalized_2008}
+S.~Sendhilkumar and T.~V. Geetha.
+\newblock Personalized ontology for web search personalization.
+\newblock In {\em Proceedings of the 1st Bangalore Annual Compute Conference},
+  {COMPUTE} '08, page 18:1–18:7, New York, {NY}, {USA}, 2008. {ACM}.
+
+\bibitem{sieg_representing_2007}
+Ahu Sieg, Bamshad Mobasher, and Robin Burke.
+\newblock Representing context in web search with ontological user profiles.
+\newblock In {\em Proceedings of the 6th international and interdisciplinary
+  conference on Modeling and using context}, {CONTEXT'07}, page 439–452,
+  Berlin, Heidelberg, 2007. Springer-Verlag.
+
+\bibitem{sieg_representing_2007-1}
+Ahu Sieg, Bamshad Mobasher, and Robin Burke.
+\newblock Representing context in web search with ontological user profiles.
+\newblock In {\em Proceedings of the 6th international and interdisciplinary
+  conference on Modeling and using context}, {CONTEXT'07}, page 439–452,
+  Berlin, Heidelberg, 2007. Springer-Verlag.
+
+\bibitem{smith_owl_2004}
+Michael~K. Smith, Chris Welty, and Debora~L. {McGuinnes}.
+\newblock {OWL} web ontology language guide.
+\newblock {http://www.w3.org/TR/owl-guide/}, 2004.
+
+\bibitem{srinvas_explicit_2012}
+C~Srinvas.
+\newblock Explicit user profiles for semantic web search using {XML}.
+\newblock {\em International Journal of Engineering Research and Applications
+  ({IJERA)}}, 2(6):234--241, December 2012.
+
+\bibitem{stamou_ontology-driven_2009}
+Sofia Stamou, Lefteris Kozanidis, Paraskevi Tzekou, and Nikos Zotos.
+\newblock Ontology-driven personalized query refinement.
+\newblock {\em J. Web Eng.}, 8(2):113–153, June 2009.
+
+\bibitem{sumalatha_information_2007}
+{M.R.} Sumalatha, V.~Vaidehi, A.~Kannan, and S.~Anandhi.
+\newblock Information retrieval using semantic web browser - personalized and
+  categorical web search.
+\newblock In {\em International Conference on Signal Processing, Communications
+  and Networking, 2007. {ICSCN} '07}, pages 238 --243, February 2007.
+
+\bibitem{suresh_study_2007}
+{R.M.} Suresh.
+\newblock A study on the ontology based web mining for digital library.
+\newblock In {\em {IET-UK} International Conference on Information and
+  Communication Technology in Electrical Sciences ({ICTES} 2007), 2007.
+  {ICTES}}, pages 1096 --1100, December 2007.
+
+\bibitem{szomszor_semantic_2008}
+Martin Szomszor, Harith Alani, Ivan Cantador, Kieron {O'Hara}, and Nigel
+  Shadbolt.
+\newblock Semantic modelling of user interests based on cross-folksonomy
+  analysis.
+\newblock In {\em Proceedings of the 7th International Conference on The
+  Semantic Web}, {ISWC} '08, page 632–648, Berlin, Heidelberg, 2008.
+  Springer-Verlag.
+
+\bibitem{tao_tums:_2012}
+Ke~Tao, Fabian Abel, Qi~Gao, and Geert-Jan Houben.
+\newblock {TUMS:} twitter-based user modeling service.
+\newblock In {\em Proceedings of the 8th international conference on The
+  Semantic Web}, {ESWC'11}, page 269–283, Berlin, Heidelberg, 2012.
+  Springer-Verlag.
+
+\bibitem{terzi_knowledge_2003}
+Evimaria Terzi, Athena Vakali, Mohand-Sad Hacid, Informatics Dpt, and
+  Université Claude~Bernard Lyon.
+\newblock Knowledge representation, ontologies, and the semantic web.
+\newblock In {\em In Asia-Pacific Web Conference ({APWeb}}, 2003.
+
+\bibitem{_open_2013}
+test.
+\newblock Open directory project.
+\newblock http://dmoz.org/, 2013.
+
+\bibitem{thomas_growing_2008}
+C.~Thomas, P.~Mehra, R.~Brooks, and A.~Sheth.
+\newblock Growing fields of interest - using an expand and reduce strategy for
+  domain model extraction.
+\newblock In {\em Web Intelligence and Intelligent Agent Technology, 2008.
+  {WI-IAT} '08. {IEEE/WIC/ACM} International Conference on}, volume~1, pages
+  496 --502, December 2008.
+
+\bibitem{wu_enabling_2001}
+Yi-Hung Wu, Yong-Chuan Chen, and {A.L.P.} Chen.
+\newblock Enabling personalized recommendation on the web based on user
+  interests and behaviors.
+\newblock In {\em Eleventh International Workshop on Research Issues in Data
+  Engineering, 2001. Proceedings}, pages 17 --24, 2001.
+
+\bibitem{xu_privacy-enhancing_2007}
+Yabo Xu, Ke~Wang, Benyu Zhang, and Zheng Chen.
+\newblock Privacy-enhancing personalized web search.
+\newblock In {\em Proceedings of the 16th international conference on World
+  Wide Web}, {WWW} '07, page 591–600, New York, {NY}, {USA}, 2007. {ACM}.
+
+\bibitem{yang_semantic_2011}
+Huirong Yang, Pengbin Fu, Baocai Yin, Mengduo Ma, and Yanyan Tang.
+\newblock A semantic similarity measure between web services based on google
+  distance.
+\newblock In {\em Proceedings of the 2011 {IEEE} 35th Annual Computer Software
+  and Applications Conference}, {COMPSAC} '11, page 14–19, Washington, {DC},
+  {USA}, 2011. {IEEE} Computer Society.
+
+\bibitem{yang_semantic_2011-1}
+Huirong Yang, Pengbin Fu, Baocai Yin, Mengduo Ma, and Yanyan Tang.
+\newblock A semantic similarity measure between web services based on google
+  distance.
+\newblock In {\em Computer Software and Applications Conference ({COMPSAC)},
+  2011 {IEEE} 35th Annual}, pages 14 --19, July 2011.
+
+\end{thebibliography}

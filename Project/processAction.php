@@ -14,7 +14,11 @@ $_SESSION['controller'] = $controller;
 */
 
 $controller = new MainController();
-    $_SESSION['controller'] = $controller;
+
+$_SESSION['controller'] = $controller;
+    
+/*
+//unset($_SESSION);
 if (!isset($_SESSION['controller'])) {
 
     $controller = new MainController();
@@ -23,6 +27,10 @@ if (!isset($_SESSION['controller'])) {
     echo("new session started!");
 }
 
+  */  
+if (isset($_GET['getMainTopics'])) {
+    $_SESSION['controller']->getMainTopics();
+}    
 if (isset($_GET['update'])) {
     $_SESSION['controller']->update();
 }
@@ -41,6 +49,10 @@ if(isset($_GET['saveKeywords'])) {
     echo $_SESSION['controller']->saveKeywords($_REQUEST['saveKeywords']);
     return;
     
+}
+if(isset($_GET['selectDBpedia'])){
+        echo $_SESSION['controller']->selectAllDBpedia();
+
 }
 if(isset($_GET['printAll'])) {
 

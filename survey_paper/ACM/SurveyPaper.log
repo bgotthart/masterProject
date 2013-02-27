@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.10.4)  19 JAN 2013 13:32
+This is pdfTeXk, Version 3.1415926-1.40.9 (Web2C 7.5.7) (format=pdflatex 2010.10.4)  22 FEB 2013 15:19
 entering extended mode
  %&-line parsing enabled.
 **SurveyPaper.tex
@@ -215,21 +215,21 @@ LaTeX Font Info:    ... okay on input line 31.
 \MPnumerator=\count113
 \everyMPtoPDFconversion=\toks37
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 87.
+LaTeX Font Info:    Try loading font information for U+msa on input line 88.
  (/usr/local/texlive/2008/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2002/01/19 v2.2g AMS font definitions
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 87.
+LaTeX Font Info:    Try loading font information for U+msb on input line 88.
 
 (/usr/local/texlive/2008/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2002/01/19 v2.2g AMS font definitions
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 87.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 88.
 
 (/usr/local/texlive/2008/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-Overfull \hbox (5.81908pt too wide) in paragraph at lines 104--105
+Overfull \hbox (5.81908pt too wide) in paragraph at lines 105--106
 \T1/aer/m/n/9 lieben, um In-for-ma-tio-nen per-son-al-isiert zu fil-tern. Das S
 amm-
  []
@@ -241,68 +241,68 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Overfull \hbox (2.85147pt too wide) in paragraph at lines 118--119
+Overfull \hbox (2.85147pt too wide) in paragraph at lines 119--120
 \T1/aer/m/n/9 nutzer zuzuweisen. Im fol-gen-den wer-den Se-man-tic Web Tech-
  []
 
 
-Overfull \hbox (4.4874pt too wide) in paragraph at lines 136--137
+Overfull \hbox (4.4874pt too wide) in paragraph at lines 137--138
 \T1/aer/m/n/9 je weiter au-seinan-der zwei Knoten liegen, desto weniger haben
  []
 
 
-Overfull \hbox (2.14943pt too wide) in paragraph at lines 139--141
+Overfull \hbox (2.14943pt too wide) in paragraph at lines 140--142
 \T1/aer/m/it/9 DBpedia \T1/aer/m/n/9 veröf-fentlich die Daten aus Wikipedia in 
 einer struk-
  []
 
 
-Overfull \hbox (3.05879pt too wide) in paragraph at lines 143--145
+Overfull \hbox (3.05879pt too wide) in paragraph at lines 144--146
 \T1/aer/m/n/9 Um aus einem Text se-man-tis-che In-for-ma-tion her-auszubekom-
  []
 
 
-Overfull \hbox (2.7053pt too wide) in paragraph at lines 143--145
+Overfull \hbox (2.7053pt too wide) in paragraph at lines 144--146
 \T1/aer/m/n/9 (wie zum Beispiel Entitäten-Extraktion, Schlüsselwörter- Ex-
  []
 
 [2]
-Underfull \hbox (badness 10000) in paragraph at lines 146--146
+Underfull \hbox (badness 10000) in paragraph at lines 147--147
 [][]\T1/aer/m/n/9 http://www.opencalais.com/documentation/opencalais-
  []
 
 
-Overfull \hbox (9.9559pt too wide) in paragraph at lines 146--147
+Overfull \hbox (9.9559pt too wide) in paragraph at lines 147--148
 []\T1/aer/m/n/9 Die bekan-ntesten APIs sind Open-Calais [], Ze-manta [], Alchem
 y
  []
 
-LaTeX Font Info:    Try loading font information for T1+aett on input line 151.
+LaTeX Font Info:    Try loading font information for T1+aett on input line 152.
 
 (/usr/local/texlive/2008/texmf-dist/tex/latex/ae/t1aett.fd
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
 )
-Overfull \hbox (9.94414pt too wide) in paragraph at lines 166--166
+Overfull \hbox (9.94414pt too wide) in paragraph at lines 167--167
 []    \T1/aett/m/n/9 @prefix wi: <http://purl.org/ontology/wi/core#> .[] 
  []
 
 
-Overfull \hbox (9.94414pt too wide) in paragraph at lines 166--166
+Overfull \hbox (9.94414pt too wide) in paragraph at lines 167--167
 []    \T1/aett/m/n/9 @prefix wo: <http://purl.org/ontology/wo/core#> .[] 
  []
 
 
-Overfull \hbox (19.37599pt too wide) in paragraph at lines 166--166
+Overfull \hbox (19.37599pt too wide) in paragraph at lines 167--167
 []\T1/aett/m/n/9 a wo:Weight ; wo:weight_value 10.0 ; wo:scale ex:AScale[] 
  []
 
 
-Overfull \hbox (8.37703pt too wide) in paragraph at lines 168--169
+Overfull \hbox (8.37703pt too wide) in paragraph at lines 169--170
 \T1/aer/m/n/9 vorhinein gefiltert und zusam-menge-fügt wer-den und auf Grund
  []
 
 
-Overfull \hbox (5.25446pt too wide) in paragraph at lines 172--174
+Overfull \hbox (5.25446pt too wide) in paragraph at lines 173--175
 \T1/aer/m/n/9 auf all-ge-meinen In-for-ma-tio-nen über die Samm-lung von Daten,
 
  []

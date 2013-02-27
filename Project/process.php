@@ -190,7 +190,7 @@ require_once 'processAction.php';
                 </form>
 
                 <form action="processAction.php" method="post" id="addTerm">
-                    <label for="term">Term: </label> <input id="term" type="text" value="Gymnastics, Sports" name="term" size="100"/>
+                    <label for="term">Term: </label> <input id="term" type="text" value="" name="term" size="100"/>
 
                     <input type="hidden" value="test" />
                     <input type="submit" value="Start DBpedia Analyse" />

@@ -87,14 +87,7 @@ class Zemanta {
         }
         
         $responseArray['keywords'] = $keywords;
-/*
-        $tmpCats = (array)$xml->xpath("//categories");
-        $categories = array();
-        foreach ($tmpCats as $item) {
-            array_push($categories, (array)$item);
-        }
-        $responseArray['categories'] = $categories;
-*/
+
         return $responseArray;
     }
     

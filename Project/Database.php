@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /*
  * To change this template, choose Tools | Templates
@@ -11,29 +11,38 @@
  * @author biancagotthart
  */
 require_once("DBpediaDatabase.php");
-
+require_once("DBpediaDatabase_Local.php");
+require_once("DBpediaDatabase_Online.php");
 class DatabaseClass {
 
     private $arc_store;
     private $dbpedia_store;
-
+    
     const EX_URL = "http://www.example.org/";
     const PREFIX_EX = "PREFIX ex: <http://www.example.org#>";
     const PREFIX_RDF = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
     const PREFIX_OX = "PREFIX owl: <http://www.w3.org/2002/07/owl#>";
 
     private $dbpedia_database;
+    private $dbpedia_database2;
+
+
     private $user_id = "http://www.example.org#BiancaGotthart";
     private $testKeywords = Array("IOS" => Array(0 => "http://dbpedia.org/resource/Category:Mach", 1 => "http://dbpedia.org/resource/Category:Microkernels", 2 => "http://dbpedia.org/resource/Category:Operating_system_kernels", 3 => "http://dbpedia.org/resource/Category:Computer_architecture", 4 => "http://dbpedia.org/resource/Category:Areas_of_computer_science", 5 => "http://dbpedia.org/resource/Category:Computer_science", 6 => "http://dbpedia.org/resource/Category:Applied_sciences", 7 => "http://dbpedia.org/resource/Category:Scientific_disciplines", 8 => "http://dbpedia.org/resource/Category:Science", 9 => "http://dbpedia.org/resource/Category:IOS"),
         "Android" => Array());
 
     public function __construct() {
 
+        $this->initDBStore();
+        $this->initDBpediaDump();
+        
         $this->dbpedia_database = new DBpedia_DatabaseClass();
+        $this->dbpedia_database2 = new DBpedia_DatabaseOnlineClass($this->dbpedia_store);
 
         $this->loadConfigFile();
-
-        $this->initDBStore();
+        
+        
+ 
     }
 
     public function deleteUserQuery() {
@@ -81,7 +90,14 @@ class DatabaseClass {
 
 
         $saveConcepts = $this->dbpedia_database->getCategories($keywords);
+       // $saveConcepts = $this->dbpedia_database2->getCategories($keywords);
 
+        
+        echo("\n saved concepts 2: \n");
+        print_r($saveConcepts);
+
+
+        die("stop bevor insert");
         $errors = false;
 
         $config_xml = $this->loadConfigFile();
@@ -187,7 +203,7 @@ class DatabaseClass {
     public function selectQuery() {
 
 
-        $q = self::PREFIX_EX . ' ' .
+ /*       $q = self::PREFIX_EX . ' ' .
                 self::PREFIX_OX . ' ' .
                 self::PREFIX_RDF . ' ' .
                 ' SELECT DISTINCT ?concept ?name ?weight
@@ -198,9 +214,31 @@ class DatabaseClass {
                     ?concept  <http://www.example.org#hasName> ?name . 
                     FILTER ( ?weight > 8 )
                 } GROUP BY ?concept';
+        
+*/
+             $q = self::PREFIX_EX . ' ' .
+                self::PREFIX_OX . ' ' .
+                self::PREFIX_RDF . ' ' .
+                ' SELECT DISTINCT ?concept ?name (count(?connection) as ?weight)
+                    WHERE
+                {     
+                    ?concept rdf:type ex:Concept .
+                    ?connection rdf:type ex:Concept .
+                    ?concept  <http://www.example.org#hasName> ?name . 
+                    ?connection <http://www.example.org#hasName> ?connectionName .
+                    
+{
+                    ?connection <http://www.example.org#isConnectedWith> ?concept . 
+                        
+                        
+                    }UNION{
+                        ?concept <http://www.example.org#hasConnectionTo> ?connection .
+                    }
+                    
+                } GROUP BY ?concept LIMIT 10' ;
 
-
-
+      
+    
         if ($errs = $this->arc_store->getErrors()) {
             echo '{"response": [{ "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
         }
@@ -216,62 +254,6 @@ class DatabaseClass {
 
                     $topics[$row['concept']]['weight'] = $row['weight'];
                 }
-
-                $concept = $row['concept'];
-                $name = $row['name'];
-
-
-                $q = self::PREFIX_EX . ' ' .
-                        self::PREFIX_OX . ' ' .
-                        self::PREFIX_RDF . ' ' .
-                        ' SELECT DISTINCT *
-                    WHERE
-                {     
-                    ?concept rdf:type ex:Concept .
-                    ?connection rdf:type ex:Concept .
-                    <' . $concept . '> rdf:type ex:Concept .
-                    ?concept  <http://www.example.org#hasName> "' . $name . '" .
-                    ?connection <http://www.example.org#hasName> ?connectionName .
-                    
-                    {
-                        ?connection <http://www.example.org#isConnectedWith> ?concept . 
-                        
-                        
-                    }UNION{
-                        ?concept <http://www.example.org#hasConnectionTo> ?connection .
-                    }
-                    
-                     
-                        ?connection <http://www.example.org#hasWeight> ?connectionWeight .
-                        FILTER ( ?connectionWeight > 20 )
-                    
-                     
-                        ?concept <http://www.example.org#hasWeight> ?conceptWeight .
-                        FILTER ( ?conceptWeight > 20 )
-                    
-                }';
-
-                if ($connectionErrs = $this->arc_store->getErrors()) {
-                    echo("ERROR in SELECT Connection of Concepts: ");
-                    print_r($connectionErrs);
-                    return;
-                }
-
-                $connections = array();
-                if ($connectionRows = $this->arc_store->query($q, 'rows')) {
-
-                    foreach ($connectionRows as $connection) {
-                        // print_r($connection);
-
-                        if ($connection != $concept) {
-                            $connection['connection'] = $connection['connection'];
-                            $connection['connectionName'] = $connection['connectionName'];
-                            $connection['connectionWeight'] = $connection['connectionWeight'];
-                            array_push($connections, $connection);
-                        }
-                    }
-                    $topics[$row['concept']]['connections'] = $connections;
-                }
             }
         } else {
             echo '{"response": [{ status: 200, "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
@@ -281,6 +263,112 @@ class DatabaseClass {
         return $topics;
     }
 
+   
+
+    private function initDBStore() {
+
+        $config_xml = $this->loadConfigFile();
+
+        $db_config = array(
+            'db_host' => (string) $config_xml->database->db_host,
+            'db_name' => (string) $config_xml->database->db_name,
+            'db_user' => (string) $config_xml->database->db_user,
+            'db_pwd' => (string) $config_xml->database->db_pwd,
+            /* SPARQL endpoint settings */
+            'endpoint_features' => array(
+                'select', 'construct', 'ask', 'describe', // allow read
+                'load', 'insert', 'delete', // allow update
+                'dump' // allow backup
+            ),
+        );
+
+        $this->arc_store = ARC2::getStore($db_config);
+        if (!$this->arc_store->isSetUp()) {
+            $this->arc_store->setUp();
+
+            $this->arc_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/Profile_v1.owl>');
+        }
+        $this->arc_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/Profile_v1.owl>');
+
+        if ($errs = $this->arc_store->getErrors()) {
+            echo("ERROR in INIT DB: ");
+            print_r($errs);
+        }
+    }
+
+    public function initDBpediaDump() {
+        $config_xml = $this->loadConfigFile();
+    
+        $dbpedia_config = array(
+            'db_host' => (string) $config_xml->database->db_host,
+            'db_name' => (string) $config_xml->database->db_name,
+            'db_user' => (string) $config_xml->database->db_user,
+            'db_pwd' => (string) $config_xml->database->db_pwd,
+            'store_name' => 'dbpedia_store',
+            'endpoint_features' => array(
+                'select', 'construct', 'ask', 'describe', // allow read
+                'load', 'insert', 'delete', // allow update
+                'dump' // allow backup
+            ),
+        );
+        $this->dbpedia_store = ARC2::getStore($dbpedia_config);
+        if (!$this->dbpedia_store->isSetUp()) {
+            $this->dbpedia_store->setUp();
+
+             $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/skos_categories_en.nt>');
+        }
+
+       // $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/article_categories_en.nt>');
+	//$this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/skos_categories_en.nt>');
+
+        if ($errs = $this->dbpedia_store->getErrors()) {
+            echo("ERROR in INIT DBpedia Dump: ");
+            print_r($errs);
+        }
+
+    }
+
+    private function loadConfigFile() {
+        return simplexml_load_file("../config/config.xml");
+    }
+
+    /****** debugging methods *****/
+
+    public function getMainTopics() {
+        print_r($this->dbpedia_database->main_topic_classification);
+    }
+    
+     public function selectAllDBpedia(){
+        
+        $q = self::PREFIX_EX . ' ' .
+                self::PREFIX_OX . ' ' .
+                self::PREFIX_RDF . ' ' .
+                'SELECT DISTINCT * WHERE {
+                ?x
+                <http://www.w3.org/2004/02/skos/core#broader>
+                <http://dbpedia.org/resource/Category:Main_topic_classifications>
+                }';
+
+
+        if ($errs = $this->dbpedia_store->getErrors()) {
+            echo '{"response": [{ "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
+        }
+        $table = "<table>";
+        if ($rows = $this->dbpedia_store->query($q, 'rows')) {
+
+            foreach ($rows as $row) {
+                
+                $table .= "<tr>";
+                 $table .= "<td>".$row['x']."</td>";
+                 $table .= "</tr>";
+ 
+            }
+            
+        }
+        $table .= "</table>";
+        print_r($table);
+        
+    }
     public function selectAllQuery() {
 
 
@@ -382,79 +470,6 @@ class DatabaseClass {
         }
 
         return $topics;
-    }
-
-    private function initDBStore() {
-
-        $config_xml = $this->loadConfigFile();
-
-        $db_config = array(
-            'db_host' => (string) $config_xml->database->db_host,
-            'db_name' => (string) $config_xml->database->db_name,
-            'db_user' => (string) $config_xml->database->db_user,
-            'db_pwd' => (string) $config_xml->database->db_pwd,
-            /* SPARQL endpoint settings */
-            'endpoint_features' => array(
-                'select', 'construct', 'ask', 'describe', // allow read
-                'load', 'insert', 'delete', // allow update
-                'dump' // allow backup
-            ),
-        );
-
-        $this->arc_store = ARC2::getStore($db_config);
-        if (!$this->arc_store->isSetUp()) {
-            $this->arc_store->setUp();
-
-            $this->arc_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/Profile_v1.owl>');
-        }
-        $this->arc_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/Profile_v1.owl>');
-
-        if ($errs = $this->arc_store->getErrors()) {
-            echo("ERROR in INIT DB: ");
-            print_r($errs);
-        }
-    }
-
-    public function initDBpediaDump() {
-        $config_xml = $this->loadConfigFile();
-        /*
-         * TODO: Install local DBpedia Dump
-         */
-
-        $dbpedia_config = array(
-            'db_host' => (string) $config_xml->database->db_host,
-            'db_name' => (string) $config_xml->database->db_name,
-            'db_user' => (string) $config_xml->database->db_user,
-            'db_pwd' => (string) $config_xml->database->db_pwd,
-            'store_name' => 'dbpedia_store',
-            'endpoint_features' => array(
-                'select',
-                'load'
-            ),
-        );
-        $this->dbpedia_store = ARC2::getStore($dbpedia_config);
-        if (!$this->dbpedia_store->isSetUp()) {
-            $this->dbpedia_store->setUp();
-
-            // $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/article_categories_en.nt>');
-        }
-
-        $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/article_categories_en.nt>');
-
-        if ($errs = $this->dbpedia_store->getErrors()) {
-            echo("ERROR in INIT DBpedia Dump: ");
-            print_r($errs);
-        }
-
-        die("finished with dbpedia dump");
-    }
-
-    private function loadConfigFile() {
-        return simplexml_load_file("../config/config.xml");
-    }
-
-    public function getMainTopics() {
-        return $this->dbpedia_database->main_topic_classification;
     }
 
 }

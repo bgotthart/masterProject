@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99c (Web2C 7.5.7)
+The top-level auxiliary file: MyLibrary.aux
+The style file: abbrv.bst
+Database file #1: MyLibrary.bib
+Warning--empty booktitle in grcar_user_2005
+Warning--empty year in milne_open-source_????-1
+Warning--empty booktitle in min_building_2011
+Warning--empty booktitle in pretschner_ontology_1999
+You've used 53 entries,
+            2118 wiz_defined-function locations,
+            762 strings with 12720 characters,
+and the built_in function-call counts, 21838 in all, are:
+= -- 2253
+> -- 880
+< -- 31
++ -- 356
+- -- 291
+* -- 1266
+:= -- 3168
+add.period$ -- 172
+call.type$ -- 53
+change.case$ -- 301
+chr.to.int$ -- 0
+cite$ -- 57
+duplicate$ -- 1074
+empty$ -- 1719
+format.name$ -- 291
+if$ -- 4993
+int.to.chr$ -- 0
+int.to.str$ -- 53
+missing$ -- 45
+newline$ -- 266
+num.names$ -- 109
+pop$ -- 403
+preamble$ -- 1
+purify$ -- 250
+quote$ -- 0
+skip$ -- 987
+stack$ -- 0
+substring$ -- 1241
+swap$ -- 501
+text.length$ -- 31
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 208
+warning$ -- 4
+while$ -- 173
+width$ -- 55
+write$ -- 606
+(There were 4 warnings)

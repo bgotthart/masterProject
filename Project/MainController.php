@@ -19,16 +19,11 @@ class MainController {
         $this->DB_store = new DatabaseClass();
     }
 
-    public function initDBpediaDump() {
-        $this->DB_store->initDBpediaDump();
-    }
-
     /*
      * Handles Request of BrowserPlugin
      * and initiiates saving Keywords and Concepts in Database
 
      */
-
     public function handlingAPIRequests($url) {
         $responseZemanta = json_decode($this->callZemantaAPI($url));
 
@@ -46,80 +41,68 @@ class MainController {
      */
 
     public function printAllUserInterests() {
-
-      
         $this->userInterests = $this->DB_store->selectAllQuery();
-        
         $result = "<ul>";
 
-        
         foreach ($this->userInterests as $topic) {
-            $result .= "<li>" . $topic['name'];;
-            
-            if(isset($topic['connections'])){
-                $result .=  "<ul> ";
-                foreach($topic['connections'] as $connection){
-                    $result .= "<li>". $connection['connectionName']."</li> ";
+            $result .= "<li>" . $topic['name'];
+           
+            if (isset($topic['connections'])) {
+                $result .= "<ul> ";
+                foreach ($topic['connections'] as $connection) {
+                    $result .= "<li>" . $connection['connectionName'] . "</li> ";
                     //$result .= $connection['connectionWeight']."</li>";
                 }
                 $result .= "</ul></li>";
-            }else{
+            } else {
                 $result .= "</li>";
             }
-            
-            
         }
         $result .= "</ul>";
-        
+
         return $result;
     }
+
     public function printUserInterests() {
 
-      
         $this->userInterests = $this->DB_store->selectQuery();
-        
+
         $result = "<ul>";
 
-        
         foreach ($this->userInterests as $topic) {
-            $result .= "<li>" .$topic['name'];
-            if(isset($topic['weight'])){
-                //$result .= ': '.$topic['weight'];
+            $result .= "<li>" . $topic['name'];
+            if (isset($topic['weight'])) {
+                $result .= ': '.$topic['weight'];
             }
-            
-            
+
             $result .= "</li>";
-            
-    
         }
         $result .= "</ul>";
-        
+
         return $result;
     }
-    
+
     public function saveKeywords($keywords) {
-        
+
         $extracted = explode(", ", $keywords);
 
-      
-        if(count($extracted) > 0 || strlen($extracted) > 0){
-            
+
+        if (count($extracted) > 0 || strlen($extracted) > 0) {
+
             $extractedResponse = $this->DB_store->insertUserQuery($extracted);
             //$this->userInterests = $this->DB_store->selectQuery();
-        }else{
+        } else {
             $extractedResponse = '{"response": [{ "status": 400, "function":"insertUserQuery" , "message":"ERROR: Entities NOT added to User Profile" }]}';
         }
 
         $response = json_decode($extractedResponse, true);
-        
-        
-        if($response['response'][0]['status'] == 400 || $response['response'][0]['status'] == '400'){
+
+
+        if ($response['response'][0]['status'] == 400 || $response['response'][0]['status'] == '400') {
             return $extractedResponse;
-        }else{
+        } else {
             return json_encode($response['response'][0]);
         }
-        
-
     }
 
     /*
@@ -144,19 +127,6 @@ class MainController {
      * API Calls
      */
 
-    private function callOpenCalaisAPI($url) {
-        $url = urlencode($url);
-        $config_xml = $this->loadConfigFile();
-        $apikey = (string) $config_xml->apis->opencalais->apikey;
-
-        $oc = new OpenCalais($apikey, "bgotthart");
-        $oc->outputFormat = "XML/RDF";
-        $content = file_get_contents($url);
-        $entities = $oc->parse($content);
-
-        return $entities;
-    }
-
     public function callZemantaAPI($url) {
 
         $config_xml = $this->loadConfigFile();
@@ -166,41 +136,71 @@ class MainController {
         $zemanta = new Zemanta($apikey);
         $content = file_get_contents($url);
         $entities = $zemanta->parse($content);
-        
+
 
         return json_encode($entities);
     }
 
-    private function callAlchemyAPI($url) {
-        $config_xml = $this->loadConfigFile();
+    /*
+      private function callAlchemyAPI($url) {
+      $config_xml = $this->loadConfigFile();
 
-        $apikey = (string) $config_xml->apis->alchemy->apikey;
-        $alchemyObj = new AlchemyAPI();
-        $alchemyObj->setAPIKey($apikey);
+      $apikey = (string) $config_xml->apis->alchemy->apikey;
+      $alchemyObj = new AlchemyAPI();
+      $alchemyObj->setAPIKey($apikey);
 
-        $xml = $alchemyObj->URLGetRankedNamedEntities($url, AlchemyAPI::XML_OUTPUT_MODE);
-        $xml = new SimpleXMLElement($xml);
-        $response['entities'] = $xml->xpath("//entities");
+      $xml = $alchemyObj->URLGetRankedNamedEntities($url, AlchemyAPI::XML_OUTPUT_MODE);
+      $xml = new SimpleXMLElement($xml);
+      $response['entities'] = $xml->xpath("//entities");
 
-        $xml = $alchemyObj->URLGetRankedKeywords($url, AlchemyAPI::XML_OUTPUT_MODE);
-        $xml = new SimpleXMLElement($xml);
-        $response['keywords'] = $xml->xpath("//keyword");
+      $xml = $alchemyObj->URLGetRankedKeywords($url, AlchemyAPI::XML_OUTPUT_MODE);
+      $xml = new SimpleXMLElement($xml);
+      $response['keywords'] = $xml->xpath("//keyword");
 
-        return $response;
-    }
+      return $response;
+      }
+      private function callOpenCalaisAPI($url) {
+      $url = urlencode($url);
+      $config_xml = $this->loadConfigFile();
+      $apikey = (string) $config_xml->apis->opencalais->apikey;
+
+      $oc = new OpenCalais($apikey, "bgotthart");
+      $oc->outputFormat = "XML/RDF";
+      $content = file_get_contents($url);
+      $entities = $oc->parse($content);
+
+      return $entities;
+      }
+     */
 
     private function loadConfigFile() {
 
         return simplexml_load_file("../config/config.xml");
     }
-    public function update(){
+
+    /*     * **** debugging methods **** */
+
+    public function initDBpediaDump() {
+        $this->DB_store->initDBpediaArticleCategoriesDump();
+        $this->DB_store->initDBpediaSKOSDump();
+    }
+
+    public function selectAllDBpedia() {
+        $this->DB_store->selectAllDBpedia();
+    }
+
+    public function getMainTopics() {
+        $this->DB_store->getMainTopics();
+    }
+
+    public function update() {
         $this->DB_store->updateUserQuery();
     }
-    public function delete(){
+
+    public function delete() {
         $this->DB_store->deleteUserQuery();
     }
+
 }
-
-
 
 ?>
