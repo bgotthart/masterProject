@@ -5,6 +5,7 @@ bin-release/
 
 # Other files and folders
 .settings/
+config/catalog-v001.xml
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
@@ -12,4 +13,14 @@ bin-release/
 /nbproject/private/
 
 #project files
-Enguided/
+Enguided
+
+config/article_categories_en.nt
+config/article_categories_en.nt.bz2
+config/article_categories_de.nt
+config/article_categories_de.nt.bz2
+config/skos_categories_en.nt
+config/skos_categories_en.nt.bz2
+config/skos_categories_de.nt.bz2
+config/skos_categories_de.nt.bz2
+
