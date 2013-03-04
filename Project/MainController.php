@@ -24,44 +24,23 @@ class MainController {
      * and initiiates saving Keywords and Concepts in Database
 
      */
+
     public function handlingAPIRequests($url) {
-        $responseZemanta = json_decode($this->callZemantaAPI($url));
+
+        $responseZemanta = json_decode($this->callZemantaAPI($url), true);
 
         $keywords = array();
         foreach ($responseZemanta['keywords'] as $keyword) {
             array_push($keywords, $keyword['name']);
         }
 
-
+        
         return $this->DB_store->insertUserQuery($keywords);
     }
 
     /*
      * return the output for the user interests
      */
-
-    public function printAllUserInterests() {
-        $this->userInterests = $this->DB_store->selectAllQuery();
-        $result = "<ul>";
-
-        foreach ($this->userInterests as $topic) {
-            $result .= "<li>" . $topic['name'];
-           
-            if (isset($topic['connections'])) {
-                $result .= "<ul> ";
-                foreach ($topic['connections'] as $connection) {
-                    $result .= "<li>" . $connection['connectionName'] . "</li> ";
-                    //$result .= $connection['connectionWeight']."</li>";
-                }
-                $result .= "</ul></li>";
-            } else {
-                $result .= "</li>";
-            }
-        }
-        $result .= "</ul>";
-
-        return $result;
-    }
 
     public function printUserInterests() {
 
@@ -71,9 +50,11 @@ class MainController {
 
         foreach ($this->userInterests as $topic) {
             $result .= "<li>" . $topic['name'];
+
             if (isset($topic['weight'])) {
-                $result .= ': '.$topic['weight'];
+                $result .= ': ' . $topic['weight'];
             }
+
 
             $result .= "</li>";
         }
@@ -141,24 +122,26 @@ class MainController {
         return json_encode($entities);
     }
 
+    private function callAlchemyAPI($url) {
+        $config_xml = $this->loadConfigFile();
+
+        $apikey = (string) $config_xml->apis->alchemy->apikey;
+        $alchemyObj = new AlchemyAPI();
+        $alchemyObj->setAPIKey($apikey);
+
+        $xml = $alchemyObj->URLGetRankedNamedEntities($url, AlchemyAPI::XML_OUTPUT_MODE);
+        $xml = new SimpleXMLElement($xml);
+        $response['entities'] = $xml->xpath("//entities");
+/*
+        $xml = $alchemyObj->URLGetRankedKeywords($url, AlchemyAPI::XML_OUTPUT_MODE);
+        $xml = new SimpleXMLElement($xml);
+        $response['keywords'] = $xml->xpath("//keyword");
+ * 
+ */
+        return $response;
+    }
+
     /*
-      private function callAlchemyAPI($url) {
-      $config_xml = $this->loadConfigFile();
-
-      $apikey = (string) $config_xml->apis->alchemy->apikey;
-      $alchemyObj = new AlchemyAPI();
-      $alchemyObj->setAPIKey($apikey);
-
-      $xml = $alchemyObj->URLGetRankedNamedEntities($url, AlchemyAPI::XML_OUTPUT_MODE);
-      $xml = new SimpleXMLElement($xml);
-      $response['entities'] = $xml->xpath("//entities");
-
-      $xml = $alchemyObj->URLGetRankedKeywords($url, AlchemyAPI::XML_OUTPUT_MODE);
-      $xml = new SimpleXMLElement($xml);
-      $response['keywords'] = $xml->xpath("//keyword");
-
-      return $response;
-      }
       private function callOpenCalaisAPI($url) {
       $url = urlencode($url);
       $config_xml = $this->loadConfigFile();
@@ -199,6 +182,29 @@ class MainController {
 
     public function delete() {
         $this->DB_store->deleteUserQuery();
+    }
+
+    public function printAllUserInterests() {
+        $this->userInterests = $this->DB_store->selectAllQuery();
+        $result = "<ul>";
+
+        foreach ($this->userInterests as $topic) {
+            $result .= "<li>" . $topic['name'] . ": " . $topic['weight'];
+
+            if (isset($topic['connections'])) {
+                $result .= "<ul> ";
+                foreach ($topic['connections'] as $connection) {
+                    $result .= "<li>" . $connection['connectionName'] . "</li> ";
+                    //$result .= $connection['connectionWeight']."</li>";
+                }
+                $result .= "</ul></li>";
+            } else {
+                $result .= "</li>";
+            }
+        }
+        $result .= "</ul>";
+        echo($result);
+        return $result;
     }
 
 }

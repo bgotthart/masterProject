@@ -66,13 +66,20 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         $bestNode = "";
         foreach ($categoriesArray as $category) {
 
+            $cleanedTerm = $this->cleaningCategoryTerm($category);
             if (in_array($category, $this->main_topic_classification)) {
-                $bestNode = $category;
+                $term = new TermItem($category, $cleanedTerm, 1);
+
+                //$bestNode = $category;
+                $bestNode = $term;
                 return $bestNode;
             }
-            $cleanedTerm = $this->cleaningCategoryTerm($category);
+            
             if ($keyword == $cleanedTerm) {
-                $bestNode = $category;
+                $term = new TermItem($category, $cleanedTerm, 1);
+
+                //$bestNode = $category;
+                $bestNode = $term;
                 return $bestNode;
             }
 
@@ -83,7 +90,10 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                 return $bestNode;
             }
             if ($bestSimilarity < $similarity) {
-                $bestNode = $category;
+                $term = new TermItem($category, $cleanedTerm, $similarity);
+
+                //$bestNode = $category;
+                $bestNode = $term;
                 $bestSimilarity = $similarity;
             }
         }
@@ -111,6 +121,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
             $response = $this->sendExternalRequestWithSelect($select);
 
+            if($response == null){
+                return null;
+            }
             $child = '';
             foreach ($response->result as $item) {
                 $child = (string) $item->binding->uri;
@@ -124,7 +137,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                         break;
                     }
                 }
-
+                                
                 if (in_array($child, $this->blacklist_topics)) {
                     $in_blacklist = true;
                 }
@@ -136,8 +149,8 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                     $this->openList[$child] = $child;
                 }
             }
-
-            $this->addToGraph($keywordConcept);
+            $term = new TermItem($keywordConcept, $keyword, 0);
+            $this->addToGraph($term);
 
             $bestNode = $this->getBestNode($keyword, $categoriesArray);
             $this->iterative_search_for_categories($bestNode, $keyword);
@@ -148,31 +161,31 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     }
 
     private function addToGraph($node) {
-        if (!key_exists($node, $this->graph)) {
-            $this->graph[$node] = array();
+        $uri = $node->getUri();
+        if (!key_exists($uri, $this->graph)) {
+            $this->graph[$uri] = array();
         }
 
-        $this->graph[$node] = $node;
+        $this->graph[$uri] = $node;
     }
 
     private function iterative_search_for_categories($node, $keyword) {
 
 
-        if (count($node) > 0) {
-
-            if (key_exists($node, $this->openList)) {
-                unset($this->openList[$node]);
+            $uri = $node->getUri();
+            if (key_exists($uri, $this->openList)) {
+                unset($this->openList[$uri]);
             }
 
-            array_push($this->closedList, $node);
+            array_push($this->closedList, $uri);
 
-            if (in_array($node, $this->main_topic_classification)) {
+            if (in_array($uri, $this->main_topic_classification)) {
                 $this->addToGraph($node);
                 return;
             }
 
 
-            $children = $this->getCategoriesOfCategory($node);
+            $children = $this->getCategoriesOfCategory($uri);
 
             if (count($children) > 0) {
                 foreach ($children as $child) {
@@ -204,8 +217,8 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                     $this->iterative_search_for_categories($bestNode, $keyword);
                 }
             } else {
-                if (key_exists($node, $this->graph)) {
-                    unset($this->graph[$node]);
+                if (key_exists($uri, $this->graph)) {
+                    unset($this->graph[$uri]);
                 }
 
                 $children = array_values($this->openList);
@@ -219,7 +232,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
                 $this->iterative_search_for_categories($bestNode, $keyword);
             }
-        }
+        
     }
 
     public function getCategoriesOfCategory($category) {
@@ -231,6 +244,10 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             $select = 'SELECT DISTINCT ?x WHERE { <http://dbpedia.org/resource/Category:' . $category . '> <http://www.w3.org/2004/02/skos/core#broader> ?x . }';
 
             $response = $this->sendExternalRequestWithSelect($select);
+            if($response == null){
+                return null;
+            }
+            
             $child = '';
             $results = array();
             foreach ($response->result as $item) {
@@ -280,6 +297,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
             $response = $this->sendExternalRequestWithSelect($select);
 
+            if($response == null){
+                return null;
+            }
             $child = '';
             $result = array();
 
@@ -354,14 +374,16 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         $b = log(count($aLinksB));
         $ab = log($intersection);
 
-        $googleMeasure = ((max($a, $b) - $ab) / (3573789 - min($a, $b)));
+        $googleMeasure = ((max($a, $b) - $ab) / (log(3573789) - min($a, $b)));
 
         if (is_nan($googleMeasure) || is_infinite($googleMeasure) || $googleMeasure < 0 || $googleMeasure > 1) {
             return 0;
         }
+        $newGoogle = 1 - $googleMeasure;
+        
         return $googleMeasure;
     }
-
+    
     private function initMainTopicClassification() {
 
         $this->main_topic_classification = array();
@@ -374,6 +396,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                 }';
 
             $response = $this->sendExternalRequestWithSelect($query);
+            if($response == null){
+                return null;
+            }
             $child = '';
             foreach ($response->result as $item) {
                 $child = (string) $item->binding->uri;
@@ -468,15 +493,22 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
 
         $response = curl_exec($ch);
-
-        echo curl_error($ch);
-
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
         curl_close($ch);
+        
+        if($httpCode == 400) {
+            return null;
+        }else{
+            
+            $obj = new SimpleXMLElement($response);
+            $obj = $obj->results;
 
-        $obj = new SimpleXMLElement($response);
-        $obj = $obj->results;
 
-        return $obj;
+            return $obj;
+        }
+        
+
     }
 
 }

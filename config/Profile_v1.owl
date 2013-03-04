@@ -65,6 +65,12 @@
     
 
 
+    <!-- http://www.example.org#connectionHasConcept -->
+
+    <owl:ObjectProperty rdf:about="&www;connectionHasConcept"/>
+    
+
+
     <!-- http://www.example.org#hasConnectionTo -->
 
     <owl:ObjectProperty rdf:about="&www;hasConnectionTo">
@@ -112,15 +118,15 @@
     
 
 
-    <!-- http://www.example.org#hasName -->
+    <!-- http://www.example.org#hasConnectionWeight -->
 
-    <owl:DatatypeProperty rdf:about="&www;hasName"/>
+    <owl:DatatypeProperty rdf:about="&www;hasConnectionWeight"/>
     
 
 
-    <!-- http://www.example.org#hasWeight -->
+    <!-- http://www.example.org#hasName -->
 
-    <owl:DatatypeProperty rdf:about="&www;hasWeight"/>
+    <owl:DatatypeProperty rdf:about="&www;hasName"/>
     
 
 
@@ -154,6 +160,12 @@
     
 
 
+    <!-- http://www.example.org#Connection -->
+
+    <owl:Class rdf:about="&www;Connection"/>
+    
+
+
     <!-- http://www.example.org#User -->
 
     <owl:Class rdf:about="&www;User">
@@ -173,6 +185,28 @@
     
 
 
+    <!-- http://www.example.org#Apple -->
+
+    <owl:NamedIndividual rdf:about="&www;Apple">
+        <rdf:type rdf:resource="&www;Concept"/>
+        <hasName rdf:datatype="&rdfs;Literal">Apple</hasName>
+        <hasConnectionTo rdf:resource="&www;IOS"/>
+        <hasConnectionTo rdf:resource="&www;Technology"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.example.org#Apple_IOS -->
+
+    <owl:NamedIndividual rdf:about="&www;Apple_IOS">
+        <rdf:type rdf:resource="&www;Connection"/>
+        <hasConnectionWeight rdf:datatype="&xsd;int">0.4</hasConnectionWeight>
+        <connectionHasConcept rdf:resource="&www;Apple"/>
+        <connectionHasConcept rdf:resource="&www;IOS"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://www.example.org#BiancaGotthart -->
 
     <owl:NamedIndividual rdf:about="&www;BiancaGotthart">
@@ -182,147 +216,23 @@
     
 
 
-    <!-- http://www.example.org#Computers -->
-
-    <owl:NamedIndividual rdf:about="&www;Computers">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">Computers</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.example.org#Computing -->
-
-    <owl:NamedIndividual rdf:about="&www;Computing">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">Computing</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.example.org#Embedded_operating_systems -->
-
-    <owl:NamedIndividual rdf:about="&www;Embedded_operating_systems">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">Embedded operating systems</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
-    </owl:NamedIndividual>
-    
-
-
     <!-- http://www.example.org#IOS -->
 
     <owl:NamedIndividual rdf:about="&www;IOS">
         <rdf:type rdf:resource="&www;Concept"/>
-        <hasWeight rdf:datatype="&xsd;int">10</hasWeight>
         <hasName rdf:datatype="&rdfs;Literal">IOS</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
+        <hasConnectionTo rdf:resource="&www;Apple"/>
         <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.example.org#IOS_(Apple) -->
+    <!-- http://www.example.org#Smartphone -->
 
-    <owl:NamedIndividual rdf:about="&www;IOS_(Apple)">
+    <owl:NamedIndividual rdf:about="&www;Smartphone">
         <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">IOS (Apple)</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
+        <hasName rdf:datatype="&rdfs;Literal">Smartphone</hasName>
         <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.example.org#Mobile_phone_operating_systems -->
-
-    <owl:NamedIndividual rdf:about="&www;Mobile_phone_operating_systems">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">Mobile phone operating systems</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.example.org#Software_systems -->
-
-    <owl:NamedIndividual rdf:about="&www;Software_systems">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">Software systems</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.example.org#System_software -->
-
-    <owl:NamedIndividual rdf:about="&www;System_software">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">System software</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
     </owl:NamedIndividual>
     
 
@@ -331,35 +241,21 @@
 
     <owl:NamedIndividual rdf:about="&www;Technology">
         <rdf:type rdf:resource="&www;Concept"/>
-        <hasWeight rdf:datatype="&xsd;int">5</hasWeight>
         <hasName rdf:datatype="&rdfs;Literal">Technology</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
+        <hasConnectionTo rdf:resource="&www;Apple"/>
+        <hasConnectionTo rdf:resource="&www;IOS"/>
+        <hasConnectionTo rdf:resource="&www;Smartphone"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- http://www.example.org#Technology_systems -->
+    <!-- http://www.example.org#Technology_IOS -->
 
-    <owl:NamedIndividual rdf:about="&www;Technology_systems">
-        <rdf:type rdf:resource="&www;Concept"/>
-        <hasName rdf:datatype="&rdfs;Literal">Technology systems</hasName>
-        <hasConnectionTo rdf:resource="&www;Computers"/>
-        <hasConnectionTo rdf:resource="&www;Computing"/>
-        <hasConnectionTo rdf:resource="&www;Embedded_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;IOS_(Apple)"/>
-        <hasConnectionTo rdf:resource="&www;Mobile_phone_operating_systems"/>
-        <hasConnectionTo rdf:resource="&www;Software_systems"/>
-        <hasConnectionTo rdf:resource="&www;System_software"/>
-        <hasConnectionTo rdf:resource="&www;Technology"/>
-        <hasConnectionTo rdf:resource="&www;Technology_systems"/>
+    <owl:NamedIndividual rdf:about="&www;Technology_IOS">
+        <rdf:type rdf:resource="&www;Connection"/>
+        <hasConnectionWeight rdf:datatype="&xsd;int">0.5</hasConnectionWeight>
+        <connectionHasConcept rdf:resource="&www;IOS"/>
+        <connectionHasConcept rdf:resource="&www;Technology"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

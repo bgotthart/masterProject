@@ -65,13 +65,6 @@ require_once 'processAction.php';
                         }
                         
 
-                        
-                        if(data == "url=http%3A%2F%2Fnews.yahoo.com%2Feu-u-verge-difficult-free-trade-negotiations-014752735--finance.html"){
-                            keywordsOutput = "Free_trade";
-                            console.log(keywordsOutput);
-                        }else   if(data == "url=http%3A%2F%2Fnews.bbc.co.uk%2Fsport2%2Fhi%2Folympics%2Fgymnastics%2F7566647.stm"){
-                            keywordsOutput = "Gymnastics";
-                        }
                         $("#keywords").html(keywordsOutput);
                         $("#keywords_container").show();
                         $("#term").val(keywordsOutput);

@@ -66,7 +66,9 @@ if (isset($_REQUEST['call']) && $_REQUEST['call'] == "callZemantaAPI") {
 
     return;
 }
+
 if (isset($_REQUEST['call']) && $_REQUEST['call'] == "handlingAPIRequest") {
+    
     echo $_SESSION['controller']->handlingAPIRequests($_REQUEST['url']);
 
     return;
