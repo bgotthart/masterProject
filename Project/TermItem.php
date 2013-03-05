@@ -15,13 +15,21 @@ class TermItem {
     private $name;
     private $uri;
     private $weight = 0.0;
+    private $isMainTopic = false;
     
-    public function __construct($uri, $name, $weight) {
+    public function __construct($uri, $name, $weight, $isMainTopic = false) {
         $this->name = $name;
         $this->uri = $uri;
         $this->weight = $weight;
+        $this->isMainTopic = $isMainTopic;
     }
     
+    public function getIsMainTopic(){
+        return $this->isMainTopic;
+    }
+    public function setIsMainTopic($bool){
+        $this->isMainTopic = $bool;
+    }
     public function getName(){
         return $this->name;
     }

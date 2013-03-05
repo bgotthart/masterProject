@@ -9,14 +9,16 @@ if(!isset($_POST['url'])){
 }else{
     $url = $_POST['url'];
 }
+$config_xml = simplexml_load_file("../../config/config.xml");
 
-$alchemyObj = new AlchemyAPI();
-$alchemyObj->loadAPIKey("../../config/api_key.txt");
+        $apikey = (string) $config_xml->apis->alchemy->apikey;
+        $alchemyObj = new AlchemyAPI();
+        $alchemyObj->setAPIKey($apikey);
 
 //$content = file_get_contents("../data/example.html");
 //$result = $alchemyObj ->URLGetCategory("http://www.cnn.com/2011/09/28/us/massachusetts-pentagon-plot-arrest/index.html?hpt=hp_t1", 'json');
 
-$xml = $alchemyObj->URLGetCategory($url, AlchemyAPI::XML_OUTPUT_MODE);
-
+//$xml = $alchemyObj->URLGetCategory($url, AlchemyAPI::XML_OUTPUT_MODE);
+$xml = $alchemyObj->URLGetConstraintQuery($url, "inside");
 print_r($xml);
 ?>

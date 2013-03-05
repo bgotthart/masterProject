@@ -68,15 +68,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
             $cleanedTerm = $this->cleaningCategoryTerm($category);
             if (in_array($category, $this->main_topic_classification)) {
-                $term = new TermItem($category, $cleanedTerm, 1);
-
-                //$bestNode = $category;
-                $bestNode = $term;
-                return $bestNode;
-            }
-            
-            if ($keyword == $cleanedTerm) {
-                $term = new TermItem($category, $cleanedTerm, 1);
+                $term = new TermItem($category, $cleanedTerm, 1, true);
 
                 //$bestNode = $category;
                 $bestNode = $term;
@@ -85,6 +77,15 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
             $similarity = $this->dbpediaSimilarityCheck($keyword, $category);
 
+            //if keyword has own category name
+            if ($keyword == $cleanedTerm) {
+                $term = new TermItem($category, $cleanedTerm, $similarity);
+
+                //$bestNode = $category;
+                $bestNode = $term;
+                return $bestNode;
+            }
+            
             if ($similarity == 1) {
                 $bestNode = $category;
                 return $bestNode;
@@ -286,13 +287,25 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                             ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . 
                          ?b <http://www.w3.org/2004/02/skos/core#broader> ?c . 
                          ?c <http://www.w3.org/2004/02/skos/core#broader> ?d 
+
                       }';
+                
+                
+               /* $select = 'SELECT DISTINCT * WHERE {
+                              <http://dbpedia.org/resource/' . $term . '> <http://purl.org/dc/terms/subject> ?a .
+                            ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  .
+                      }';
+                * 
+                */
             } else {
                 $select = 'SELECT DISTINCT * WHERE { <http://dbpedia.org/resource/Category:' . $term . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
                      ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . 
                      ?b <http://www.w3.org/2004/02/skos/core#broader> ?c . 
                      ?c <http://www.w3.org/2004/02/skos/core#broader> ?d 
+
                     }';
+                 
+                //$select = 'SELECT DISTINCT * WHERE { <http://dbpedia.org/resource/Category:' . $term . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }';
             }
 
             $response = $this->sendExternalRequestWithSelect($select);
@@ -314,6 +327,121 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                     }
                 }
             }
+            /*
+            $subresult = array();        
+            foreach($result as $child){
+
+                $select = 'SELECT DISTINCT * WHERE { <' . $child . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
+                     ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }';
+                
+                $subResponse = $this->sendExternalRequestWithSelect($select);
+                
+                
+                if($subResponse != null){
+                   foreach ($subResponse->result as $a) {
+
+                        foreach ($a->binding as $item) {
+                            $child = (string) $item->uri;
+
+                            if (!in_array($child, $result)) {
+                                array_push($result, $child);
+                                array_push($subresult, $child);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            $subresult2 = array();
+            foreach($subresult as $child){
+
+                $select = 'SELECT DISTINCT * WHERE { <' . $child . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
+                     ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }';
+                
+                $subResponse = $this->sendExternalRequestWithSelect($select);
+
+                if($subResponse != null){
+                   foreach ($subResponse->result as $a) {
+
+                        foreach ($a->binding as $item) {
+                            $child = (string) $item->uri;
+
+                            if (!in_array($child, $result)) {
+                                array_push($result, $child);
+                                array_push($subresult2, $child);
+                            }
+                        }
+                    }
+                }
+            }
+            $subresult3 = array();
+            foreach($subresult2 as $child){
+
+                $select = 'SELECT DISTINCT * WHERE { <' . $child . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
+                     ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }';
+                
+                $subResponse = $this->sendExternalRequestWithSelect($select);
+                
+                $subresult = array();
+                if($subResponse != null){
+                   foreach ($subResponse->result as $a) {
+
+                        foreach ($a->binding as $item) {
+                            $child = (string) $item->uri;
+
+                            if (!in_array($child, $result)) {
+                                array_push($result, $child);
+                                array_push($subresult3, $child);
+                            }
+                        }
+                    }
+                }
+            }
+            $subresult4 = array();
+            foreach($subresult3 as $child){
+
+                $select = 'SELECT DISTINCT * WHERE { <' . $child . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
+                     ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }';
+                
+                $subResponse = $this->sendExternalRequestWithSelect($select);
+                
+                $subresult = array();
+                if($subResponse != null){
+                   foreach ($subResponse->result as $a) {
+
+                        foreach ($a->binding as $item) {
+                            $child = (string) $item->uri;
+
+                            if (!in_array($child, $result)) {
+                                array_push($result, $child);
+                                array_push($subresult4, $child);
+                            }
+                        }
+                    }
+                }
+            }
+           /* foreach($subresult4 as $child){
+
+                $select = 'SELECT DISTINCT * WHERE { <' . $child . '> <http://www.w3.org/2004/02/skos/core#broader> ?a . 
+                     ?a <http://www.w3.org/2004/02/skos/core#broader> ?b  . }';
+                
+                $subResponse = $this->sendExternalRequestWithSelect($select);
+                
+                $subresult = array();
+                if($subResponse != null){
+                   foreach ($subResponse->result as $a) {
+
+                        foreach ($a->binding as $item) {
+                            $child = (string) $item->uri;
+
+                            if (!in_array($child, $result)) {
+                                array_push($result, $child);
+                            }
+                        }
+                    }
+                }
+            }
+                */
 
             return $result;
         } catch (SQLException $oException) {
@@ -326,9 +454,6 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         //$termA = $this->cleaningCategoryTerm($termA);
 
         $termB = $this->cleaningCategoryTerm($termB);
-
-        if ($termA == $termB)
-            return 1;
 
         //$aLinksA = $this->get3LevelCategories($termA, 1);
 
@@ -357,12 +482,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                 array_push($combindedCats, $aLinksB[$i]);
                 $intersection++;
             }
-            /*
-              if(in_array($aLinksB[$i], $this->main_topic_classification)){
-              return 1;
-              }
-             * 
-             */
+           
         }
 
         //calculate google distance inspired measure
@@ -381,7 +501,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         }
         $newGoogle = 1 - $googleMeasure;
         
-        return $googleMeasure;
+        return $newGoogle;
     }
     
     private function initMainTopicClassification() {
@@ -444,7 +564,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         return $categoryName;
     }
 
-    public function prepareName($term) {
+    public function convertNameToGetLiteral($term) {
 
 
         if (strstr($term, "_") !== false) {

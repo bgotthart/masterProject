@@ -50,7 +50,8 @@ class MainController {
 
         foreach ($this->userInterests as $topic) {
             $result .= "<li>" . $topic['name'];
-
+            if(isset($topic['connection']))
+             $result .= ": " . $topic['connection']['uri'];
             if (isset($topic['weight'])) {
                 $result .= ': ' . $topic['weight'];
             }
@@ -107,7 +108,16 @@ class MainController {
     /*
      * API Calls
      */
-
+    public function get_data($url) {
+        $ch = curl_init();
+        $timeout = 5;
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        $data = curl_exec($ch);
+        curl_close($ch);
+        return $data;
+    }
     public function callZemantaAPI($url) {
 
         $config_xml = $this->loadConfigFile();
@@ -141,7 +151,7 @@ class MainController {
         return $response;
     }
 
-    /*
+    
       private function callOpenCalaisAPI($url) {
       $url = urlencode($url);
       $config_xml = $this->loadConfigFile();
@@ -154,7 +164,7 @@ class MainController {
 
       return $entities;
       }
-     */
+     
 
     private function loadConfigFile() {
 

@@ -79,6 +79,7 @@ class Zemanta {
         $tmpKeywords = (array)$xml->xpath("//keyword");
         $keywords = array();
         foreach ($tmpKeywords as $item) {
+           
             $itemArray = (array)$item;
             if($itemArray['confidence'] > 0.07){
                 array_push($keywords, (array)$item);
