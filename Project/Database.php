@@ -26,16 +26,16 @@ class DatabaseClass {
     const PREFIX_OX = "PREFIX owl: <http://www.w3.org/2002/07/owl#>";
 
     private $dbpedia_database;
-    private $dbpedia_database2;
+   // private $dbpedia_database2;
     private $user_id = "http://www.example.org#BiancaGotthart";
 
     public function __construct() {
 
         $this->initDBStore();
-        $this->initDBpediaDump();
+        //$this->initDBpediaDump();
 
         $this->dbpedia_database = new DBpedia_DatabaseClass();
-        $this->dbpedia_database2 = new DBpedia_DatabaseOnlineClass($this->dbpedia_store);
+        //$this->dbpedia_database2 = new DBpedia_DatabaseOnlineClass($this->dbpedia_store);
 
         $this->loadConfigFile();
     }
@@ -237,6 +237,27 @@ class DatabaseClass {
         }
     }
 
+    public function insertFeedQuery($keywords) {
+
+        $saveConcepts = $this->dbpedia_database->getCategories($keywords);
+        
+        print_r($saveConcepts);
+        
+        die("stop before insert feed query");
+        
+        $resultJson .= "}]";
+
+        if (!$errors) {
+            $response = '{"response": [{ "status": 200, "function":"insertUserQuery" ,"message":"Entities are successfully added to User Profile", ' . $resultJson . '}]}';
+            echo($response);
+            return $response;
+        } else {
+            $response = '{"response": [{ "status": 400, "function":"insertUserQuery" , "message":"ERROR: Entities NOT added to User Profile" }]}';
+            echo($response);
+            return $response;
+        }
+    }
+
     private function getConnectionWeightOfTerms() {
         $q = self::PREFIX_EX . ' ' .
                 self::PREFIX_OX . ' ' .
@@ -289,7 +310,7 @@ class DatabaseClass {
     }
 
     public function selectQuery() {  
-           
+      
         
    /*     
         $q = self::PREFIX_EX . ' ' .
@@ -618,6 +639,14 @@ class DatabaseClass {
         return $topics;
     }
 
+    public function similarityCheckWithLinks($term1, $term2){
+        return $this->dbpedia_database->dbpediaSimilarityLinkCheck($term1, $term2);
+
+    }
+    public function similarityCheckWithCategories($term1, $term2){
+        
+        return $this->dbpedia_database->dbpediaSimilarityCheck($term1, $term2);
+    }
 }
 
 ?>

@@ -81,7 +81,7 @@ class Zemanta {
         foreach ($tmpKeywords as $item) {
            
             $itemArray = (array)$item;
-            if($itemArray['confidence'] > 0.07){
+            if($itemArray['confidence'] > 0.05){
                 array_push($keywords, (array)$item);
             }
             

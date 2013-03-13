@@ -15,8 +15,38 @@ class WikipediaMiningAPI extends DBpedia_DatabaseClass{
     
     public function __construct() {
 
-  
-    }            
+        try {
+            $term = (string)(urlencode($term));
+            $searchUrl = "http://wdm.cs.waikato.ac.nz/services/search?query=" . $term . "&labels=true&parentCategories=true&responseFormat=xml";
+               
+            $response = $this->sendExternalRequest($searchUrl);
+
+            $xmlobj = new SimpleXMLElement($response);
+
+            $alternativeTerms = $xmlobj->xpath("//sense");
+            
+            $highestPrio = 0.0;
+            $newTerm = $term;
+            
+            foreach ($alternativeTerms as $alternativeTerm) {
+
+                $prio = (float)$alternativeTerm->attributes()->priorProbability;
+                
+                if($highestPrio < $prio){
+                    $highestPrio = $prio;
+                    $newTerm = (string)$alternativeTerm->attributes()->title;
+                }
+                
+            }
+                                    
+            return (string)$newTerm;
+            
+        } catch (SQLException $oException) {
+            echo ("Caught SQLException: " . $oException->sError );
+        }
+    }     
+    
+    
     public function searchForTerm($term){
         
         try {

@@ -28,6 +28,17 @@ if (!isset($_SESSION['controller'])) {
 }
 
   */  
+
+if(isset($_GET['checkSimilarity'])){
+    $_SESSION['controller']->calcSimilarityBetweenTerms($_GET['term1'], $_GET['term2']);
+    
+    return;
+}
+if(isset($_GET['getFeeds'])){
+    $_SESSION['controller']->getFeeds();
+    
+    return;
+}
 if (isset($_GET['getMainTopics'])) {
     $_SESSION['controller']->getMainTopics();
 }    
