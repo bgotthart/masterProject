@@ -47,7 +47,7 @@ c:docRDFaccesible="false" calculateRelevanceScore="true" c:omitOutputtingOrigina
 
 //Create OpenCalais object by passing an api key and submitter (required by OpenCalais API
 // and relevance. NOTE: changing content_type and output are not currently supported
-    public function __construct($api_key, $submitter, $min_relevance = 0.2, $content_type = "TEXT/HTML", $output = "application/json") {
+    public function __construct($api_key, $submitter, $min_relevance = 0.5, $content_type = "TEXT/HTML", $output = "application/json") {
 
 //Create the XML we'll submit to OpenCalais
         $this->submitter = $submitter;
@@ -93,12 +93,16 @@ c:docRDFaccesible="false" calculateRelevanceScore="true" c:omitOutputtingOrigina
         $this->entityTypes['socialTags'] = array();
          $this->entityTypes['entities'] = array();
 
+         
         foreach ($this->json_obj as $entity) {
             
-            if (is_object($entity->info)) {
+            
+           
+            
+            if (isset($entity->info)) {
                 continue;
             }
-            if ($entity->_typeGroup == 'topics') {
+            /*if ($entity->_typeGroup == 'topics') {
 
                 if (count($this->entityTypes['topics']) == 0 || $this->entityTypes['topics'][0]['score'] < $entity->score) {
                     $this->entityTypes['topics'] = array();
@@ -111,22 +115,23 @@ c:docRDFaccesible="false" calculateRelevanceScore="true" c:omitOutputtingOrigina
                     continue;
                 }
             }
-
-            if ($entity->_typeGroup == 'socialTag') {
-                if ($entity->importance > 2) {
+*/
+            
+            if (isset($entity->_typeGroup) && $entity->_typeGroup == 'socialTag') {
+                if ($entity->importance >= 2) {
                     continue;
                 }
                 
                 $socialTag = array();
                 $socialTag['name'] = $entity->name;
-                $socialTag['importance'] = $entity->importance;
-                 $socialTag['calais_socialTag'] = $entity->socialTag;
+                //$socialTag['importance'] = $entity->importance;
+                 //$socialTag['calais_socialTag'] = $entity->socialTag;
                 
                 array_push($this->entityTypes['socialTags'], $socialTag);
 
                 continue;
             }
-            if ($entity->_typeGroup == 'entities') {
+            if (isset($entity->_typeGroup) && $entity->_typeGroup == 'entities') {
                 if ($entity->relevance < $this->min_relevance) {
                     continue;
                 }

@@ -49,9 +49,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
             $categories = $this->getCategoriesForKeyword($keyword);
 
-            print_r($categories);
-
-            die();
+            
             if (count($categories) > 0) {
                 array_push($categories, $keyword);
                 foreach ($categories as $category) {

@@ -35,7 +35,7 @@ and open the template in the editor.
         <feed>
             <filename>http://rss.cnn.com/rss/edition_technology.rss</filename>
         </feed>
-        <feed>
+        <!--<feed>
             <filename>https://news.google.com/news/feeds?ned=us&amp;topic=h&amp;output=rss</filename>
         </feed>
         <feed>
@@ -44,6 +44,7 @@ and open the template in the editor.
         <feed>
             <filename>http://feeds.feedburner.com/TechCrunch/</filename>
         </feed>
+        -->
     </newsfeeds>
    
 </root>

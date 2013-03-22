@@ -59,12 +59,6 @@
     
 
 
-    <!-- http://www.example.org#belongsToURI -->
-
-    <owl:ObjectProperty rdf:about="&www;belongsToURI"/>
-    
-
-
     <!-- http://www.example.org#connectionHasConcept -->
 
     <owl:ObjectProperty rdf:about="&www;connectionHasConcept"/>
@@ -79,6 +73,18 @@
     
 
 
+    <!-- http://www.example.org#hasConnectionToFeed -->
+
+    <owl:ObjectProperty rdf:about="&www;hasConnectionToFeed"/>
+    
+
+
+    <!-- http://www.example.org#hasConnectionToUser -->
+
+    <owl:ObjectProperty rdf:about="&www;hasConnectionToUser"/>
+    
+
+
     <!-- http://www.example.org#hasInterest -->
 
     <owl:ObjectProperty rdf:about="&www;hasInterest"/>
@@ -88,15 +94,6 @@
     <!-- http://www.example.org#hasMainTopic -->
 
     <owl:ObjectProperty rdf:about="&www;hasMainTopic"/>
-    
-
-
-    <!-- http://www.example.org#isAbout -->
-
-    <owl:ObjectProperty rdf:about="&www;isAbout">
-        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
-        <owl:inverseOf rdf:resource="&www;belongsToURI"/>
-    </owl:ObjectProperty>
     
 
 
@@ -148,6 +145,12 @@
     
 
 
+    <!-- http://www.example.org#hasTimestamp -->
+
+    <owl:DatatypeProperty rdf:about="&www;hasTimestamp"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -181,6 +184,12 @@
     <!-- http://www.example.org#Connection -->
 
     <owl:Class rdf:about="&www;Connection"/>
+    
+
+
+    <!-- http://www.example.org#FeedURI -->
+
+    <owl:Class rdf:about="&www;FeedURI"/>
     
 
 

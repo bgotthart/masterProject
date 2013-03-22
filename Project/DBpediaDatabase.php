@@ -14,6 +14,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
     public $main_topic_classification;
     private $blacklist_topics;
+    private $blacklist_keywords;
     private $limit = 5;
     private $depth = 0;
     private $max_depth = 5;
@@ -26,8 +27,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     public function __construct() {
 
         $this->initMainTopicClassification();
+        $this->blacklist_keywords = array("CNN");
 
-        $this->blacklist_topics = array("_by_", "WikiProject_", "Wikipedia_categories", "Categories_by_", "Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
+        $this->blacklist_topics = array("_by_", "WikiProject_", "Government_of_", "Wikipedia_categories", "Categories_by_", "Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
     }
 
     public function getCategories($keywords) {
@@ -37,28 +39,36 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         $this->openList = array();
 
         $concepts = array();
-
+        
+        
         foreach ($keywords as $keyword) {
+            $in_blacklist = false;
+            foreach ($this->blacklist_keywords as $blacklist) {
 
-            if (!key_exists($keyword, $concepts)) {
-                $concepts[$keyword] = array();
-            }
-            $categories = array();
+                if (strpos($keyword, $blacklist) != 0 || strpos($keyword, $blacklist) != null) {
 
-            //check if keyword exists in dbpedia
-            //$keyword = $this->lookForDBpediaConcept($keyword, $keywords);
-
-            //$keyword = "http://dbpedia.org/resource/".$keyword;
-           
-
-            $categories = $this->getCategoriesForKeyword($keyword);
-
-             
-            if (count($categories) > 0) {
-                foreach ($categories as $category) {
-                    array_push($concepts[$keyword], $category);
+                    $in_blacklist = true;
+                    break;
                 }
             }
+
+            if (in_array($keyword, $this->blacklist_keywords)) {
+                $in_blacklist = true;
+            }
+
+            if(!$in_blacklist){
+                $categories = $this->getCategoriesForKeyword($keyword);
+
+                if (count($categories) > 0) {
+                    if (!key_exists($keyword, $concepts)) {
+                        $concepts[$keyword] = array();
+                    }
+                    foreach ($categories as $category) {
+                        array_push($concepts[$keyword], $category);
+                    }
+                }
+            }
+            
         }
 
         return $concepts;
@@ -108,7 +118,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     }
 
     public function lookForDBpediaConcept($term) {
-       
+
         try {
 
             $url = "http://wdm.cs.waikato.ac.nz/services/search?query=" . urlencode($term);
@@ -120,16 +130,15 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             }
 
             $obj = new SimpleXMLElement($response);
-            
+
             $maxProbability = 0;
             $bestConcept = '';
             $bestConcept = '';
-            foreach($obj->label->senses->sense as $item){
+            foreach ($obj->label->senses->sense as $item) {
 
-                if($maxProbability < $item->attributes()->priorProbability){
+                if ($maxProbability < $item->attributes()->priorProbability) {
                     $maxProbability = $item->attributes()->priorProbability;
-                    $bestConcept = $this->prepareTermNameForDBpedia($item->attributes()->title);
-        
+                    $bestConcept = $this->prepareTermNameForDBpedia((string)$item->attributes()->title);
                 }
             }
 
@@ -138,8 +147,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             echo ("Caught SQLException: " . $oException->sError );
         }
     }
+
     public function lookForDBpediaConcept_V2($term, $keywords) {
-       
+
         try {
 
             $response = $this->sendExploreRequest('<http://dbpedia.org/resource/' . $term . '>');
@@ -158,7 +168,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
             $bestSimilarity = 0.0;
             $bestConcept = '';
             if (count($conceptsArray) > 1) {
-                
+
                 foreach ($keywords as $keyword) {
                     //nur wenn wir nicht die selben begriffe sind!
                     $concept = $this->getBestConcept($keyword, $conceptsArray);
@@ -169,9 +179,9 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                     }
                 }
             }
-            
+
             print_r($bestConcept);
-            
+
             die();
 
             return $concept;
@@ -208,13 +218,14 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         $this->graph = array();
 
         $keyword = $this->lookForDBpediaConcept($keyword);
-        
+
+        if (strlen($keyword) == 0)
+            return null;
+
         $keywordConcept = "http://dbpedia.org/resource/" . $keyword;
         $this->categoriesOfKeyword = $this->get3LevelCategories($keyword, 1);
-        
-
-        
-
+        if ($this->categoriesOfKeyword == null)
+            return null;
         $categoriesArray = array();
         try {
 
@@ -252,7 +263,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
                     $this->openList[$child] = $child;
                 }
             }
-            
+
             $term = new TermItem($keywordConcept, $keyword, 0);
             $this->addToGraph($term);
 
@@ -276,6 +287,8 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
     private function iterative_search_for_categories($node, $keyword) {
 
+        set_time_limit(15);
+        
         $uri = $node->getUri();
         if (key_exists($uri, $this->openList)) {
             unset($this->openList[$uri]);
@@ -440,35 +453,32 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         return 0;
     }
 
-    public function getBestConceptsOfArray($termA, $termB){
+    public function getBestConceptsOfArray($termA, $termB) {
         $termB = $this->cleaningCategoryTerm($termA);
-         $termB = $this->cleaningCategoryTerm($termB);
+        $termB = $this->cleaningCategoryTerm($termB);
         $aLinksB = $this->get3LevelCategories($termB, 1);
         $aLinksA = $this->get3LevelCategories($termA, 1);
 
-        
+
         return $this->similarityCalculation($aLinksA, $aLinksB);
-        
-        
     }
-    
-    public function dbpediaSimilarityCheck($termA, $termB){
+
+    public function dbpediaSimilarityCheck($termA, $termB) {
         $termA = $this->cleaningCategoryTerm($termA);
-         $termB = $this->cleaningCategoryTerm($termB);
+        $termB = $this->cleaningCategoryTerm($termB);
         $aLinksB = $this->get3LevelCategories($termB, 2);
         $aLinksA = $this->categoriesOfKeyword;
 
-         if (count($aLinksA) == 0) {
+        if (count($aLinksA) == 0) {
             array_push($this->closedList, $termB);
             return;
         }
-       return $this->similarityCalculation($aLinksA, $aLinksB);
-        
-        
+        return $this->similarityCalculation($aLinksA, $aLinksB);
     }
+
     public function similarityCalculation($aLinksA, $aLinksB) {
- 
-              
+
+
         $intersection = 0;
 
         $combindedCats = array();
@@ -578,7 +588,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         return $term;
     }
 
-   public function sendExternalRequest($url) {
+    public function sendExternalRequest($url) {
 
         // is curl installed?
         if (!function_exists('curl_init')) {
@@ -591,23 +601,21 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         //curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept: application/sparql-results+xml"));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-        curl_setopt($ch,CURLOPT_FAILONERROR,true);
+        curl_setopt($ch, CURLOPT_FAILONERROR, true);
 
         $response = curl_exec($ch);
-        
-         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-         if($httpCode != 200){
-             echo("http code:" .$httpCode);
-         }
-         if(curl_error($ch)){
-             echo("error: ".curl_error($ch));
-         }
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($httpCode != 200) {
+            echo("http code:" . $httpCode);
+        }
+        if (curl_error($ch)) {
+            echo("error: " . curl_error($ch));
+        }
 
         curl_close($ch);
-        
-        return $response;
-        
 
+        return $response;
     }
 
     public function sendExploreRequest($resource) {

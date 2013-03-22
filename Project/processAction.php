@@ -39,6 +39,13 @@ if(isset($_GET['getFeeds'])){
     
     return;
 }
+
+if(isset($_GET['saveFeeds'])){
+    $_SESSION['controller']->saveFeeds();
+    
+    return;
+}
+
 if (isset($_GET['getMainTopics'])) {
     $_SESSION['controller']->getMainTopics();
 }    
@@ -103,6 +110,10 @@ function processAction_addInterestText($text) {
 
 function processAction_printInterests() {
     return $_SESSION['controller']->printUserInterests();
+}
+
+function processAction_printFeeds() {
+    return ($_SESSION['controller']->getFeeds() );
 }
 
 ?>
