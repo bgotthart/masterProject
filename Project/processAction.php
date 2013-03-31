@@ -9,8 +9,6 @@ $controller = new MainController();
 
 $_SESSION['controller'] = $controller;
 
-
-
 */
 
 $controller = new MainController();
@@ -29,13 +27,38 @@ if (!isset($_SESSION['controller'])) {
 
   */  
 
-if(isset($_GET['checkSimilarity'])){
-    $_SESSION['controller']->calcSimilarityBetweenTerms($_GET['term1'], $_GET['term2']);
-    
+
+/*
+ * TODO
+ * addInterestItem for explicit adding of interest term
+ */
+if (isset($_POST['function'])) {
+    if ($_POST['function'] == "addInterestItem") {
+        //return processAction_addInterestText($_POST['item']);
+    }
+
     return;
 }
+
+function processAction_addInterestText($text) {
+    return "//TODO: addInterest";
+}
+
+function processAction_printInterests() {
+    return $_SESSION['controller']->printUserInterests();
+}
+function processAction_printFeedsForUser() {
+    return ($_SESSION['controller']->getFeedsForUser() );
+}
+
+/*debug*/
+
+function processAction_printAllFeeds() {
+    return ($_SESSION['controller']->getFeeds() );
+}
+
 if(isset($_GET['getFeeds'])){
-    $_SESSION['controller']->getFeeds();
+    $_SESSION['controller']->getAllFeeds();
     
     return;
 }
@@ -45,10 +68,7 @@ if(isset($_GET['saveFeeds'])){
     
     return;
 }
-
-if (isset($_GET['getMainTopics'])) {
-    $_SESSION['controller']->getMainTopics();
-}    
+  
 if (isset($_GET['update'])) {
     $_SESSION['controller']->update();
 }
@@ -80,7 +100,7 @@ if(isset($_GET['printAll'])) {
     
 }
 if (isset($_REQUEST['call']) && $_REQUEST['call'] == "callZemantaAPI") {
-    echo $_SESSION['controller']->callZemantaAPI($_REQUEST['url']);
+    echo $_SESSION['controller']->callZemantaAPIWithURL($_REQUEST['url']);
 
     return;
 }
@@ -92,28 +112,10 @@ if (isset($_REQUEST['call']) && $_REQUEST['call'] == "handlingAPIRequest") {
     return;
 }
 
-/*
- * TODO
- * addInterestItem for explicit adding of interest term
- */
-if (isset($_POST['function'])) {
-    if ($_POST['function'] == "addInterestItem") {
-        //return processAction_addInterestText($_POST['item']);
-    }
-
+if(isset($_GET['checkSimilarity'])){
+    $_SESSION['controller']->calcSimilarityBetweenTerms($_GET['term1'], $_GET['term2']);
+    
     return;
-}
-
-function processAction_addInterestText($text) {
-    return "//TODO: addInterest";
-}
-
-function processAction_printInterests() {
-    return $_SESSION['controller']->printUserInterests();
-}
-
-function processAction_printFeeds() {
-    return ($_SESSION['controller']->getFeeds() );
 }
 
 ?>

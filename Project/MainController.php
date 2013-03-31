@@ -2,7 +2,7 @@
 
 require_once('../APIs/opencalais/OpenCalais.class.php');
 require_once('../APIs/zemanta/Zemanta.class.php');
-require_once( "../APIs/alchemy/AlchemyAPI_PHP5-0.8/module/AlchemyAPI.php");
+require_once( "../APIs/alchemy/AlchemyAPI_PHP5-0.8/module/AlchemyAPI_CURL.php");
 require_once("../APIs/arc2/ARC2.php");
 require_once("Database.php");
 
@@ -40,7 +40,7 @@ class MainController {
             array_push($keywords, $keyword['name']);
         }
 
-        return $this->DB_store->insertUserQuery($keywords);
+        return $this->DB_store->saveKeywordsToUserQuery($keywords);
     }
 
     /*
@@ -49,16 +49,27 @@ class MainController {
 
     public function printUserInterests() {
 
-        $this->userInterests = $this->DB_store->selectUserQuery();
+        $this->userInterests = $this->DB_store->selectUserInterests();
 
         $result = "<ul>";
 
         foreach ($this->userInterests as $topic) {
-            $result .= "<li>" . $topic['name'];
+            $result .= "<li>" . $topic['uri'];
+            if(isset($topic['name']))
+            {
+                $result .= ", name: ".$topic['name'];
+                
+            }
+            if(isset($topic['count'])){
+                $result .= ", count: ". $topic['count'];
+            }
+            if(isset($topic['isKeyword'])){
+                $result .= ", isKeyword";
+            }
             if (isset($topic['connection']))
                 $result .= ": " . $topic['connection']['uri'];
             if (isset($topic['weight'])) {
-                $result .= ': ' . $topic['weight'];
+                $result .= ', weight: ' . $topic['weight'];
             }
 
 
@@ -76,8 +87,7 @@ class MainController {
 
         if (count($extracted) > 0 || strlen($extracted) > 0) {
 
-            $extractedResponse = $this->DB_store->insertUserQuery($extracted);
-            //$this->userInterests = $this->DB_store->selectUserQuery();
+            $extractedResponse = $this->DB_store->saveKeywordsToUserQuery($extracted);
         } else {
             $extractedResponse = '{"response": [{ "status": 400, "function":"insertUserQuery" , "message":"ERROR: Entities NOT added to User Profile" }]}';
         }
@@ -92,9 +102,20 @@ class MainController {
         }
     }
 
-    public function getFeeds() {
+    public function getFeedsForUser() {
         
-        print_r($this->DB_store->selectFeedQuery());
+        //Varianten:
+        //1: 1. Ebene (Main Topics)
+        //2: 1. + 2. Ebene 
+        //3. nur  Keywords mit meister Häufigkeit
+        //4: Verbindungen 
+        print_r($this->DB_store->selectFeedsForUser());
+       
+    }
+    
+     public function getAllFeeds() {
+        
+        print_r($this->DB_store->selectAllFeedQuery());
        
     }
     public function saveFeeds() {
@@ -107,12 +128,12 @@ class MainController {
         foreach ($feedURLs->feed as $feed) {
 
             array_push($feeds, ((string) $feed->filename));
-            return $this->fetchFeedInformation((string) $feed->filename);
+            echo $this->fetchFeedInformation((string) $feed->filename);
         }
         
        
     }
-
+   
     /*
      * Parse RSS Feed of config.xml
      */
@@ -125,18 +146,12 @@ class MainController {
         $x = new SimpleXmlElement($content);
         $urlArray = array();
 
-        $i = 10;
+        
         foreach ($x->channel->item as $entry) {
-            
-           
-            if ($i == 9) {
-                return;
-            }
-              
-            
             array_push($urlArray, $entry->link);
 
             $text = $this->getTextOfURL($entry->link);
+            
             $response = json_decode($this->callZemantaAPIWithText($text), true);
             
             //$response = $this->callOpenCalaisAPI($text);
@@ -146,12 +161,7 @@ class MainController {
             foreach ($response['keywords'] as $keyword) {
                 array_push($keywords, $keyword['name']);
             }
-
-           
-            $i--;
-
-
-            return $this->DB_store->insertFeedQuery($entry, $keywords);
+            $this->DB_store->insertFeedQuery($entry, $keywords);
             
            // die("test");
         }
@@ -169,7 +179,9 @@ class MainController {
         $apikey = (string) $config_xml->apis->zemanta->apikey;
 
         $zemanta = new Zemanta($apikey);
-        $content = file_get_contents($url);
+
+        $content = $this->getTextOfURL($url);
+
         $entities = $zemanta->parse($content);
 
         return json_encode($entities);
@@ -315,16 +327,15 @@ class MainController {
         $this->DB_store->selectAllDBpedia();
     }
 
-    public function getMainTopics() {
-        $this->DB_store->getMainTopics();
-    }
-
     public function update() {
-        $this->DB_store->updateUserQuery();
+        echo($this->DB_store->updateUserQuery("<http://dbpedia.org/resource/IPhone>"));
+        $this->printUserInterests();
     }
 
     public function delete() {
         $this->DB_store->deleteUserQuery();
+                $this->printUserInterests();
+
     }
 
     public function printAllUserInterests() {
@@ -346,15 +357,10 @@ class MainController {
             }
         }
         $result .= "</ul>";
-        echo($result);
+
         return $result;
     }
 
-    public function calcSimilarityBetweenTerms($term1, $term2) {
-
-        print_r($this->DB_store->similarityCheckWithLinks($term1, $term2));
-        // print_r($this->DB_store->similarityCheckWithCategories($term1, $term2));
-    }
 
 }
 

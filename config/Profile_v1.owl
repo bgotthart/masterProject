@@ -139,6 +139,12 @@
     
 
 
+    <!-- http://www.example.org#hasCount -->
+
+    <owl:DatatypeProperty rdf:about="&www;hasCount"/>
+    
+
+
     <!-- http://www.example.org#hasName -->
 
     <owl:DatatypeProperty rdf:about="&www;hasName"/>
@@ -148,6 +154,12 @@
     <!-- http://www.example.org#hasTimestamp -->
 
     <owl:DatatypeProperty rdf:about="&www;hasTimestamp"/>
+    
+
+
+    <!-- http://www.example.org#isKeyword -->
+
+    <owl:DatatypeProperty rdf:about="&www;isKeyword"/>
     
 
 

@@ -1,5 +1,7 @@
 <?php
 
+require_once("AlchemyAPIParams.php");
+
 class AlchemyAPI
 {
 	const XML_OUTPUT_MODE = "xml";

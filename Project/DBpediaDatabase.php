@@ -27,7 +27,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     public function __construct() {
 
         $this->initMainTopicClassification();
-        $this->blacklist_keywords = array("CNN");
+        $this->blacklist_keywords = array("CNN", "TechCrunch");
 
         $this->blacklist_topics = array("_by_", "WikiProject_", "Government_of_", "Wikipedia_categories", "Categories_by_", "Categories_of_", "Article_Feedback_Pilot", "Living_people", "Category:Categories_for_renaming", "Category:Articles", "Category:Fundamental", "Category:Concepts", "Category:Wikipedia_articles_with_missing_information", "Category:Wikipedia_maintenance", "Category:Chronology");
     }
@@ -284,11 +284,18 @@ class DBpedia_DatabaseClass extends DatabaseClass {
 
         $this->graph[$uri] = $node;
     }
+    
 
     private function iterative_search_for_categories($node, $keyword) {
-
+/*
         set_time_limit(15);
+   */
         
+        if(!($node instanceof TermItem)){
+            $this->graph = null;
+            return;
+           // die("test");
+        }
         $uri = $node->getUri();
         if (key_exists($uri, $this->openList)) {
             unset($this->openList[$uri]);
@@ -562,7 +569,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         return $category;
     }
 
-    private function cleaningCategoryTerm($term) {
+    public function cleaningCategoryTerm($term) {
         if (strstr($term, 'Category:') !== false) {
             $termArray = explode("Category:", $term);
             $categoryName = $termArray[1];
@@ -575,11 +582,11 @@ class DBpedia_DatabaseClass extends DatabaseClass {
         } else {
             $categoryName = $term;
         }
+               
         return $categoryName;
     }
 
     public function convertNameToGetLiteral($term) {
-
 
         if (strstr($term, "_") !== false) {
             $term = str_replace("_", " ", $term);

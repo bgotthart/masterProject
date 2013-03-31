@@ -27,7 +27,7 @@ require_once 'processAction.php';
             <h1>Interests of Bianca Gotthart</h1>
                 <?php
 
-                echo processAction_printFeeds();
+                echo processAction_printAllFeeds();
                 ?>
             
         </div>

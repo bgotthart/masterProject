@@ -46,9 +46,9 @@ class DatabaseClass {
 
 
         $insert = ' DELETE  {
-                   <http://dbpedia.org/resource/Category:History_of_technology> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual> ;
-                    <http://www.example.org#hasName> ?name .
-                   }';
+                   <http://dbpedia.org/resource/IPhone> <http://www.example.org#hasName> "IPhone3"  . 
+                   }
+                  ';
 
 
         $result = $this->arc_store->query($insert, '', '', true);
@@ -57,31 +57,62 @@ class DatabaseClass {
             print_r($errs);
             $errors = true;
         }
-
+        print_r($result);
         //print_r($this->selectQuery());
     }
 
-    public function updateUserQuery() {
+    public function updateUserQuery($result) {
 
         $config_xml = $this->loadConfigFile();
 
-        $insert = ' INSERT DATA {
-                   <http://dbpedia.org/resource/Sport> <http://www.example.org#hasWeight> 100 .
-                   }';
 
+        //update
+        $arr = array_keys($result);
+        $key = $arr[0];
 
-        $result = $this->arc_store->query($insert, '', '', true);
-        if ($errs = $this->arc_store->getErrors()) {
-            echo("error");
-            print_r($errs);
-            $errors = true;
+        foreach ($result as $key => $value) {
+
+            if (isset($value['http://www.example.org#hasCount'])) {
+                $count = $value['http://www.example.org#hasCount'][0]['value'];
+            } else {
+                $count = 0;
+            }
+
+            $newCount = $count + 1;
+
+            $name = $value['http://www.example.org#hasName'][0]['value'];
+
+            $insert = ' DELETE  {
+                           <' . $key . '> <http://www.example.org#hasCount> ' . $count . ' .
+                         }';
+
+            $result = $this->arc_store->query($insert, 'raws', '', true);
+            $errors = false;
+            if ($errs = $this->arc_store->getErrors()) {
+                echo("error in delete");
+                print_r($errs);
+                $errors = true;
+            }
+            $insert = ' INSERT INTO <' . $config_xml->fileBaseURL . '/config/Profile_v1.owl> {
+                            <' . $key . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+                                <http://www.example.org#hasCount> ' . $newCount . ' . }';
+
+            $result = $this->arc_store->query($insert, 'raws', '', true);
+
+            if ($errs = $this->arc_store->getErrors()) {
+                echo("error in insert");
+                print_r($errs);
+                $errors = true;
+            }
+
+            if (!$errors) {
+
+                return '{"response": [{ "status": 200, "function":"updateQuery" ,"message":"Update query successfully done."}]}';
+            }
         }
-        echo("test");
-        print_r($result);
-        // print_r($this->selectAllQuery());
     }
 
-    public function insertUserQuery($keywords) {
+    public function saveKeywordsToUserQuery($keywords) {
 
 
         $saveConcepts = $this->dbpedia_database->getCategories($keywords);
@@ -97,117 +128,116 @@ class DatabaseClass {
 
         $resultJson = '"results": [{';
         $lastConcept = end($saveConcepts);
-   
+
         foreach ($saveConcepts as $conceptKey => $conceptValue) {
 
-            $firstUri = reset($conceptValue)->getUri();
-            $last = end($conceptValue)->getUri();
-            if (strstr($conceptKey, 'Category:') !== false) {
-                $termArray = explode("Category:", $conceptKey);
-                $identifier = $termArray[1];
-            } else if (strstr($conceptKey, 'resource/') !== false) {
-                $termArray = explode("resource/", $conceptKey);
-                $identifier = $termArray[1];
-            } else if (strstr($conceptKey, 'page/') !== false) {
-                $termArray = explode("page/", $conceptKey);
-                $identifier = $termArray[1];
-            } else {
-                $identifier = $conceptKey;
-            }
+            $keyword = reset($conceptValue)->getUri();
+            $lastKeyword = end($conceptValue)->getUri();
+            
+            $identifier = $this->dbpedia_database->cleaningCategoryTerm($conceptKey);
 
             $resultJson .= '"' . $identifier . '": [';
             $mainTopics = array();
-
+            
+            //categories from firstUri
             foreach ($conceptValue as $category) {
                 $categoryURI = $category->getUri();
 
-                $name = '';
-                if (strstr($categoryURI, 'Category:') !== false) {
-                    $termArray = explode("Category:", $categoryURI);
-                    $name = $termArray[1];
-                } else if (strstr($categoryURI, 'resource/') !== false) {
-                    $termArray = explode("resource/", $categoryURI);
-                    $name = $termArray[1];
-                } else if (strstr($categoryURI, 'page/') !== false) {
-                    $termArray = explode("page/", $categoryURI);
-                    $name = $termArray[1];
-                } else {
-                    $name = $categoryURI;
-                }
+                $name = $this->dbpedia_database->cleaningCategoryTerm($categoryURI);
+               
                 $stringName = $this->dbpedia_database->convertNameToGetLiteral($name);
 
-                if ($last == $categoryURI) {
+                if ($lastKeyword == $categoryURI) {
                     $resultJson .= '{"name": "' . $stringName . '"}';
                 } else {
                     $resultJson .= '{"name": "' . $stringName . '"},';
                 }
 
-                //add concept keyword
-                $insert = ' INSERT INTO <' . $config_xml->fileBaseURL . '/config/Profile_v1.owl> {
-                  <' . $categoryURI . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual>;
+                $insert = ' DESCRIBE <' . $categoryURI . '>';
+
+                $checkResult = $this->arc_store->query($insert, 'raws', '', true);
+
+                if ($errs = $this->arc_store->getErrors()) {
+                    echo("error in check for result");
+                    print_r($errs);
+                    $errors = true;
+                }
+
+                if (count($checkResult['result']) > 0) {
+                    $this->updateUserQuery($checkResult['result']);
+                } else {
+                    //insert
+
+                    $insert = ' INSERT INTO <' . $config_xml->fileBaseURL . '/config/Profile_v1.owl> {
+                  <' . $categoryURI . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual>;
                   <http://www.example.org#hasName> "' . $stringName . '" ;
+                      <http://www.example.org#hasCount> "1"^^xsd:integer ;
                   <http://www.example.org#hasConnectionToUser> <' . $this->user_id . '> ;
                   <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#Concept> .';
 
-                if ($firstUri != $categoryURI) {
-                    $insert .= '<' . $firstUri . '> <http://www.example.org#hasConnectionTo> <' . $categoryURI . '> . ';
-                    $insert .= '<' . $categoryURI . '>  <http://www.example.org#hasConnectionTo> <' . $firstUri . '> . ';
+                    if ($keyword != $categoryURI) {
+                        $insert .= '<' . $keyword . '> <http://www.example.org#hasConnectionTo> <' . $categoryURI . '> . ';
+                        //$insert .= '<' . $categoryURI . '>  <http://www.example.org#hasConnectionTo> <' . $keyword . '> . ';
 
-                    $dataName = $category->getName();
-                    $dataWeight = $category->getWeight();
-                    $connectionUri = "" . self::EX_URL . $conceptKey . "-" . $dataName;
-                    $connectionName = $conceptKey . "-" . $dataName;
-                    $insert .= '<' . $connectionUri . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual>;
+                        $dataName = $category->getName();
+                        $dataWeight = $category->getWeight();
+                        $connectionUri = "" . self::EX_URL . $conceptKey . "-" . $dataName;
+                        $connectionName = $conceptKey . "-" . $dataName;
+                        $insert .= '<' . $connectionUri . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual>;
                                 <http://www.example.org#hasConnectionWeight> "' . $dataWeight . '" ;
                                 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#Connection> ;
-                                <http://www.example.org#connectionHasConcept> <' . $firstUri . '> ;
+                                <http://www.example.org#connectionHasConcept> <' . $keyword . '> ;
                                 <http://www.example.org#connectionHasConcept> <' . $categoryURI . '> ;
                                     <http://www.example.org#connectionHasName> "' . $connectionName . '" .
                                 ';
 
-                    if (!in_array($categoryURI, $mainTopics) && $category->getIsMainTopic()) {
+                        if (!in_array($categoryURI, $mainTopics) && $category->getIsMainTopic()) {
 
-                        $insert .= '<' . $firstUri . '> <http://www.example.org#hasMainTopic> <' . $categoryURI . '> .';
-                        $insert .= '<' . $categoryURI . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#MainTopic> ;
+                            $insert .= '<' . $keyword . '> <http://www.example.org#hasMainTopic> <' . $categoryURI . '> .';
+                            $insert .= '<' . $categoryURI . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#MainTopic> ;
                             <http://www.example.org#hasName> "' . $dataName . '" .';
 
-                        array_push($mainTopics, $categoryURI);
+                            array_push($mainTopics, $categoryURI);
+                        }
+                    }else{
+                         $insert .= '<' . $categoryURI . '> <http://www.example.org#isKeyword> "true"^^xsd:boolean .';
+
                     }
-                }
 
-                /*
-                  foreach ($conceptValue as $node2) {
-                  $data2 = $node2->getUri();
-                  if ($data2 != $categoryURI) {
-                  //$insert .= '<' . $categoryURI . '> <http://www.example.org#hasConnectionTo> <' . $data2 . '> . ';
-                  //$insert .= '<' . $data2 . '>  <http://www.example.org#hasConnectionTo> <' . $categoryURI . '> . ';
-
-
-                  $data2name = $node2->getName();
-                  $data2weight = $node2->getWeight();
-                  $connectionUri = "" .self::EX_URL. $name. "-".$data2name."";
-
-                  // $insert .=  '<' . $connectionUri . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual>;
-                  //        <http://www.example.org#hasConnectionWeight> "' . $data2weight . '" ;
-                  //       <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#Connection> ;
-                  //      <http://www.example.org#connectionHasConcept> <' . $data2 . '> ;
-                  //        <http://www.example.org#connectionHasConcept> <' . $categoryURI . '> .
-                  //  ';
+                    /*
+                      foreach ($conceptValue as $node2) {
+                      $data2 = $node2->getUri();
+                      if ($data2 != $categoryURI) {
+                      //$insert .= '<' . $categoryURI . '> <http://www.example.org#hasConnectionTo> <' . $data2 . '> . ';
+                      //$insert .= '<' . $data2 . '>  <http://www.example.org#hasConnectionTo> <' . $categoryURI . '> . ';
 
 
-                  }
-                  }
-                 */
-                $insert .= '}';
+                      $data2name = $node2->getName();
+                      $data2weight = $node2->getWeight();
+                      $connectionUri = "" .self::EX_URL. $name. "-".$data2name."";
 
+                      // $insert .=  '<' . $connectionUri . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual>;
+                      //        <http://www.example.org#hasConnectionWeight> "' . $data2weight . '" ;
+                      //       <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#Connection> ;
+                      //      <http://www.example.org#connectionHasConcept> <' . $data2 . '> ;
+                      //        <http://www.example.org#connectionHasConcept> <' . $categoryURI . '> .
+                      //  ';
+
+
+                      }
+                      }
+                     */
+                    $insert .= '}';
 
 
 
-                $result = $this->arc_store->query($insert, '', '', true);
-                if ($errs = $this->arc_store->getErrors()) {
-                    echo("error");
-                    print_r($errs);
-                    $errors = true;
+
+                    $result = $this->arc_store->query($insert, '', '', true);
+                    if ($errs = $this->arc_store->getErrors()) {
+                        echo("error");
+                        print_r($errs);
+                        $errors = true;
+                    }
                 }
             }
 
@@ -232,13 +262,13 @@ class DatabaseClass {
     }
 
     public function insertFeedQuery($entry, $keywords) {
- 
+
         $saveConcepts = $this->dbpedia_database->getCategories($keywords);
 
-                 
+
         $feedtimestamp = $entry->pubDate;
         $feedlink = (string) $entry->link;
-       
+
         if ($saveConcepts == null) {
             return '{"response": [{ "status": 400, "function":"insertFeedQuery" ,"message":"Not saved"}]}';
         }
@@ -249,7 +279,7 @@ class DatabaseClass {
 
         //add concept keyword
         $insert = ' INSERT INTO <' . $config_xml->fileBaseURL . '/config/Profile_v1.owl> {
-                  <' . $feedlink . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual>;
+                  <' . $feedlink . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual>;
                   <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#FeedURI> .';
 //                  <http://www.example.org#hasTimestamp> "' . $feedtimestamp . '" ;
 
@@ -257,22 +287,19 @@ class DatabaseClass {
         $lastConcept = end($saveConcepts);
 
         foreach ($saveConcepts as $conceptValue) {
-            
-           
+            foreach ($conceptValue as $concept) {
 
-            foreach($conceptValue as $concept){
-                
                 $item = $concept;
-                $resultJson .= $item->getName().", ";
-                $insert .= '<' . $item->getUri() . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl##NamedIndividual>;
+                $resultJson .= $item->getName() . ", ";
+                $insert .= '<' . $item->getUri() . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual>;
                   <http://www.example.org#hasName> "' . $item->getName() . '" ;
                   <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>    <http://www.example.org#Concept> . ';
 
                 $insert .= '<' . $feedlink . '> <http://www.example.org#hasConnectionTo> <' . $item->getUri() . '> . ';
                 $insert .= '<' . $item->getUri() . '> <http://www.example.org#hasConnectionTo> <' . $feedlink . '> . ';
                 $insert .= '<' . $item->getUri() . '> <http://www.example.org#hasConnectionToFeed> <' . $feedlink . '> . ';
-                
-                
+
+
                 $mainTopics = array();
 
                 if (!in_array($item->getUri(), $mainTopics) && $item->getIsMainTopic()) {
@@ -283,29 +310,24 @@ class DatabaseClass {
 
                     array_push($mainTopics, $item->getUri());
                 }
-
             }
-            $insert .= '}';
-
-            $result = $this->arc_store->query($insert, '', '', true);
-            if ($errs = $this->arc_store->getErrors()) {
-                echo("error:");
-                print_r($errs);
-                $errors = true;
-            }
-
 
             if ($lastConcept[0]->getUri() == $conceptValue[0]->getUri()) {
                 $resultJson .= "]";
             } else {
                 $resultJson .= "],";
             }
-
-           
+        }
+        $insert .= '}';
+        $result = $this->arc_store->query($insert, '', '', true);
+        if ($errs = $this->arc_store->getErrors()) {
+            echo("error:");
+            print_r($errs);
+            $errors = true;
         }
 
 
-        
+
         $resultJson .= "}]";
 
         if (!$errors) {
@@ -369,7 +391,8 @@ class DatabaseClass {
         return $connections;
     }
 
-     public function selectFeedQuery() {
+    public function selectFeedsForUser() {
+
 
         $q = self::PREFIX_EX . ' ' .
                 self::PREFIX_OX . ' ' .
@@ -383,7 +406,7 @@ class DatabaseClass {
                         ?concept  <http://www.example.org#hasConnectionToFeed> ?feed .
                         
                     } GROUP BY ?concept';
-        
+
         if ($errs = $this->arc_store->getErrors()) {
             echo '{"response": [{ "function":"selectFeedQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
             print_r($errs);
@@ -393,49 +416,53 @@ class DatabaseClass {
         if ($rows = $this->arc_store->query($q, 'rows')) {
 
             foreach ($rows as $row) {
-                if(isset($row['feed']))
-                    $feeds['feed'] = $row['feed'];
-                if(isset($row['concept']))
-                    $feeds[$row['concept']]['uri'] = $row['concept'];
-                if(isset($row['name']))
-                    $feeds[$row['concept']]['name'] = $row['name'];
-               
-
+                if (isset($row['feed']))
+                    $feeds[$row['feed']]['uri'] = $row['feed'];
+                if (isset($row['concept'])) {
+                    if (!isset($feeds[$row['feed']]['concept'])) {
+                        $feeds[$row['feed']]['concept'] = array();
+                    }
+                    $feeds[$row['feed']]['concept'][] = $row['concept'];
+                }
+                /*  if(isset($row['concept']))
+                  $feeds[$row['concept']]['uri'] = $row['concept'];
+                  if(isset($row['name']))
+                  $feeds[$row['concept']]['name'] = $row['name'];
+                 */
             }
         } else {
             echo '{"response": [{ status: 200, "function":"selectFeedQuery" ,"message":"No data returned"}]}';
             print_r($errs);
         }
         echo("----------debug information----------");
-        
+
         return $feeds;
     }
-    public function selectUserQuery() {
+
+    public function selectUserInterests() {
 
         $q = self::PREFIX_EX . ' ' .
                 self::PREFIX_OX . ' ' .
                 self::PREFIX_RDF . ' ' .
-                'SELECT DISTINCT ?concept ?name ?connection (COUNT(?connection) as ?weight)
+                'SELECT DISTINCT ?concept ?name ?count ?connection ?isKeyword (COUNT(?connection) as ?weight)
                     WHERE
                     {
                         ?concept rdf:type ex:Concept .
                         ?concept  <http://www.example.org#hasName> ?name .
-                        ?concept <http://www.example.org#hasConnectionTo> ?connection . 
-                        ?concept <http://www.example.org#hasConnectionToUser> <'.$this->user_id.'> . 
+                        OPTIONAL {
+                            ?connection <http://www.example.org#hasConnectionTo> ?concept . 
+                        }
+                        OPTIONAL
+                        {
+                           ?concept <http://www.example.org#isKeyword> ?isKeyword .
+
+                        }
+                        ?concept <http://www.example.org#hasConnectionToUser> <' . $this->user_id . '> .
+                        OPTIONAL {
+                            ?concept  <http://www.example.org#hasCount> ?count . 
+                        }
                     } GROUP BY ?concept ORDER BY DESC(xsd:integer(?weight))';
-
-        /*
-          $q = self::PREFIX_EX . ' ' .
-          self::PREFIX_OX . ' ' .
-          self::PREFIX_RDF . ' ' .
-          'SELECT DISTINCT *
-          WHERE
-          {
-          ?concept rdf:type ex:Concept .
-          ?concept  <http://www.example.org#hasName> ?name .
-
-          } GROUP BY ?concept';
-         */
+        
         if ($errs = $this->arc_store->getErrors()) {
             echo '{"response": [{ "function":"selectQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
             print_r($errs);
@@ -445,15 +472,24 @@ class DatabaseClass {
         if ($rows = $this->arc_store->query($q, 'rows')) {
 
             foreach ($rows as $row) {
-
+//print_r($row);
                 if (isset($row['name'])) {
                     $topics[$row['concept']]['name'] = $row['name'];
+                }
+
+                if (isset($row['count'])) {
+                    $topics[$row['concept']]['count'] = $row['count'];
                 }
 
                 $topics[$row['concept']]['uri'] = $row['concept'];
                 if (isset($row['connection'])) {
                     $connection = array();
                     $connection['uri'] = $row['connection'];
+                    //$topics[$row['concept']]['connection'] = $connection;
+                }
+                if (isset($row['isKeyword'])) {
+                    $connection = array();
+                    $topics[$row['concept']]['isKeyword'] = $row['isKeyword'];
                     //$topics[$row['concept']]['connection'] = $connection;
                 }
 
@@ -471,29 +507,29 @@ class DatabaseClass {
             echo '{"response": [{ status: 200, "function":"selectQuery" ,"message":"No data returned"}]}';
             print_r($errs);
         }
-        echo("----------debug information----------");
-        $connections = $this->getConnectionWeightOfTerms();
-        //print_r($connections);
+        /*
+          echo("----------debug information----------");
 
-        echo("<h1>Connections with weight</h1><ul>");
-        foreach ($connections as $topic => $value) {
-            echo("<li>" . $value['connectionName'] . ": " . $value['weight'] . "</li>");
-            //print_r($this->getMainTopicsOfUser());
-            //echo("<li>". $topic['connection']. ": " . $topic['topic'] ."</li>");
-        }
-        echo("</ul>");
+          $connections = $this->getConnectionWeightOfTerms();
 
+          echo("<h1>Connections with weight</h1><ul>");
+          foreach ($connections as $key => $value) {
+          echo("<li>" . $value['connectionName'] . ": " . $value['weight'] . "</li>");
+          }
+          echo("</ul>");
+          
 
-        echo("<h1>Main Topics </h1><ul>");
-        foreach ($this->getMainTopicsOfUser() as $topic) {
-            echo("<li>" . $topic['concept'] . ": " . $topic['topic'] . "</li>");
-        }
-        echo("</ul>");
+          echo("<h1>Main Topics </h1><ul>");
+          foreach ($this->getMainTopicsOfUser() as $topic) {
+          echo("<li>" . $topic['concept'] . ": " . $topic['topic'] . "</li>");
+          }
+          echo("</ul>");
 
-        echo("----------end debug information----------");
+          echo("----------end debug information----------");
+         * 
+         */
         return $topics;
     }
-    
 
     public function getMainTopicsOfUser() {
         $q = self::PREFIX_EX . ' ' .
@@ -504,9 +540,54 @@ class DatabaseClass {
                     {
                         ?topic rdf:type ex:MainTopic .
                         ?concept ex:hasMainTopic ?topic .
-                        ?concept <http://www.example.org#hasConnectionToUser> <'.$this->user_id.'> . 
+                        ?concept <http://www.example.org#hasConnectionToUser> <' . $this->user_id . '> . 
     
                     } GROUP BY ?concept';
+        if ($errs = $this->arc_store->getErrors()) {
+            echo '{"response": [{ "function":"selectQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
+            print_r($errs);
+        }
+
+        $topics = array();
+        $connections = array();
+        $mainTopics = array();
+        if ($rows = $this->arc_store->query($q, 'rows')) {
+
+            foreach ($rows as $row) {
+
+                $mainTopic = array();
+                $mainTopic['topic'] = $row['topic'];
+                $mainTopic['concept'] = $row['concept'];
+
+                array_push($mainTopics, $mainTopic);
+            }
+        } else {
+            echo '{"response": [{ status: 200, "function":"selectQuery" ,"message":"No data returned"}]}';
+            print_r($errs);
+        }
+        return $mainTopics;
+    }
+    
+    public function getKeywordsOfUser() {
+        $q = self::PREFIX_EX . ' ' .
+                self::PREFIX_OX . ' ' .
+                self::PREFIX_RDF . ' ' .
+                'SELECT DISTINCT ?concept ?name ?count ?connection (COUNT(?connection) as ?weight)
+                    WHERE
+                    {
+                        ?concept rdf:type ex:Concept .
+                        ?concept  <http://www.example.org#hasName> ?name .
+                        OPTIONAL {
+                            ?connection <http://www.example.org#hasConnectionTo> ?concept . 
+                        }
+                        ?concept <http://www.example.org#isKeyword> ?test .
+                        ?concept <http://www.example.org#hasConnectionToUser> <' . $this->user_id . '> .
+                        OPTIONAL {
+                            ?concept  <http://www.example.org#hasCount> ?count . 
+                        }
+                    } GROUP BY ?concept ORDER BY DESC(xsd:integer(?weight))';
+        
+        
         if ($errs = $this->arc_store->getErrors()) {
             echo '{"response": [{ "function":"selectQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
             print_r($errs);
@@ -585,9 +666,6 @@ class DatabaseClass {
             $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/skos_categories_en.nt>');
         }
 
-        // $this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/article_categories_en.nt>');
-        //$this->dbpedia_store->query('LOAD <' . (string) $config_xml->fileBaseURL . '/config/skos_categories_en.nt>');
-
         if ($errs = $this->dbpedia_store->getErrors()) {
             echo("ERROR in INIT DBpedia Dump: ");
             print_r($errs);
@@ -598,154 +676,148 @@ class DatabaseClass {
         return simplexml_load_file("../config/config.xml");
     }
 
+    
     /*     * **** debugging methods **** */
 
-    public function getMainTopics() {
-        print_r($this->dbpedia_database->main_topic_classification);
-    }
-
-    public function selectAllDBpedia() {
+    public function selectAllUserInterests() {
 
         $q = self::PREFIX_EX . ' ' .
                 self::PREFIX_OX . ' ' .
                 self::PREFIX_RDF . ' ' .
-                'SELECT DISTINCT * WHERE {
-                ?x
-                <http://www.w3.org/2004/02/skos/core#broader>
-                <http://dbpedia.org/resource/Category:Main_topic_classifications>
-                }';
-
-
-        if ($errs = $this->dbpedia_store->getErrors()) {
-            echo '{"response": [{ "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
-        }
-        $table = "<table>";
-        if ($rows = $this->dbpedia_store->query($q, 'rows')) {
-
-            foreach ($rows as $row) {
-
-                $table .= "<tr>";
-                $table .= "<td>" . $row['x'] . "</td>";
-                $table .= "</tr>";
-            }
-        }
-        $table .= "</table>";
-        print_r($table);
-    }
-
-    public function selectAllQuery() {
-
-
-        $q = self::PREFIX_EX . ' ' .
-                self::PREFIX_OX . ' ' .
-                self::PREFIX_RDF . ' ' .
-                ' SELECT DISTINCT ?concept ?name ?weight
+                'SELECT DISTINCT ?concept ?name ?count ?connection ?isKeyword (COUNT(?connection) as ?weight)
                     WHERE
-                {     
-                    ?concept rdf:type ex:Concept .
-                    OPTIONAL{ ?concept <http://www.example.org#hasWeight> ?weight . }
-                    ?concept  <http://www.example.org#hasName> ?name . 
-                    
-                } GROUP BY ?concept';
+                    {
+                        ?concept rdf:type ex:Concept .
+                        ?concept  <http://www.example.org#hasName> ?name .
+                        OPTIONAL {
+                            ?connection <http://www.example.org#hasConnectionTo> ?concept . 
+                        }
+                        OPTIONAL
+                        {
+                           ?concept <http://www.example.org#isKeyword> ?isKeyword .
 
-
-
+                        }
+                        ?concept <http://www.example.org#hasConnectionToUser> <' . $this->user_id . '> .
+                        OPTIONAL {
+                            ?concept  <http://www.example.org#hasCount> ?count . 
+                        }
+                    } GROUP BY ?concept ORDER BY DESC(xsd:integer(?weight))';
+        
         if ($errs = $this->arc_store->getErrors()) {
-            echo '{"response": [{ "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
+            echo '{"response": [{ "function":"selectQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
+            print_r($errs);
         }
 
         $topics = array();
         if ($rows = $this->arc_store->query($q, 'rows')) {
 
             foreach ($rows as $row) {
-
+//print_r($row);
                 if (isset($row['name'])) {
                     $topics[$row['concept']]['name'] = $row['name'];
-                    $topics[$row['concept']]['uri'] = $row['concept'];
-                    if (isset($row['weight'])) {
+                }
+
+                if (isset($row['count'])) {
+                    $topics[$row['concept']]['count'] = $row['count'];
+                }
+
+                $topics[$row['concept']]['uri'] = $row['concept'];
+                if (isset($row['connection'])) {
+                    $connection = array();
+                    $connection['uri'] = $row['connection'];
+                    //$topics[$row['concept']]['connection'] = $connection;
+                }
+                if (isset($row['isKeyword'])) {
+                    $connection = array();
+                    $topics[$row['concept']]['isKeyword'] = $row['isKeyword'];
+                    //$topics[$row['concept']]['connection'] = $connection;
+                }
+
+                if (isset($row['weight']) && $row['weight'] > 0) {
+                    if (!isset($topics[$row['concept']]['weight'])) {
                         $topics[$row['concept']]['weight'] = $row['weight'];
+                    } else {
+                        $weight = $topics[$row['concept']]['weight'];
+                        $weight += $row['weight'];
+                        $topics[$row['concept']]['weight'] = $weight;
                     }
-                }
-
-                $concept = $row['concept'];
-                $name = $row['name'];
-                $q = self::PREFIX_EX . ' ' .
-                        self::PREFIX_OX . ' ' .
-                        self::PREFIX_RDF . ' ' .
-                        ' SELECT DISTINCT ?connection ?connectionName
-                    WHERE
-                {     
-                    ?connection rdf:type ex:Concept .
-                    ?connection  <http://www.example.org#hasName> ?connectionName . 
-                    <' . $concept . '> rdf:type ex:Concept .
-                    ?connection  <http://www.example.org#hasName> "' . $name . '" . 
-
-    
-                }';
-
-                $q = self::PREFIX_EX . ' ' .
-                        self::PREFIX_OX . ' ' .
-                        self::PREFIX_RDF . ' ' .
-                        ' SELECT DISTINCT *
-                    WHERE
-                {     
-                    ?concept rdf:type ex:Concept .
-                    ?connection rdf:type ex:Concept .
-                    <' . $concept . '> rdf:type ex:Concept .
-                    ?concept  <http://www.example.org#hasName> "' . $name . '" .
-                    ?connection <http://www.example.org#hasName> ?connectionName .
-                    {
-                        ?connection <http://www.example.org#isConnectedWith> ?concept . 
-                        
-                        
-                    }UNION{
-                        ?concept <http://www.example.org#hasConnectionTo> ?connection .
-                    }
-                    
-                    
-    
-                }';
-
-                if ($connectionErrs = $this->arc_store->getErrors()) {
-                    echo("ERROR in SELECT Connection of Concepts: ");
-                    print_r($connectionErrs);
-                    return;
-                }
-
-                $connections = array();
-                if ($connectionRows = $this->arc_store->query($q, 'rows')) {
-
-                    foreach ($connectionRows as $connection) {
-                        // print_r($connection);
-
-                        if ($connection != $concept) {
-                            $connection['connection'] = $connection['connection'];
-                            $connection['connectionName'] = $connection['connectionName'];
-                            array_push($connections, $connection);
-                        }
-
-
-                        // $topics[$row['concept']]['connection'] = $connection['connection'];
-                        // $topics[$row['concept']]['connectionName'] = $connection['connectionName'];
-                    }
-                    $topics[$row['concept']]['connections'] = $connections;
                 }
             }
         } else {
-            return '{"response": [{ status: 200, "function":"selectQuery" ,"message":"No data returned", "error:"' . $errs . '}]}';
+            echo '{"response": [{ status: 200, "function":"selectQuery" ,"message":"No data returned"}]}';
+            print_r($errs);
         }
+        /*
+          echo("----------debug information----------");
 
+          $connections = $this->getConnectionWeightOfTerms();
+
+          echo("<h1>Connections with weight</h1><ul>");
+          foreach ($connections as $key => $value) {
+          echo("<li>" . $value['connectionName'] . ": " . $value['weight'] . "</li>");
+          }
+          echo("</ul>");
+          
+
+          echo("<h1>Main Topics </h1><ul>");
+          foreach ($this->getMainTopicsOfUser() as $topic) {
+          echo("<li>" . $topic['concept'] . ": " . $topic['topic'] . "</li>");
+          }
+          echo("</ul>");
+
+          echo("----------end debug information----------");
+         * 
+         */
         return $topics;
     }
 
-    public function similarityCheckWithLinks($term1, $term2) {
-        return $this->dbpedia_database->dbpediaSimilarityLinkCheck($term1, $term2);
+    public function selectAllFeedQuery() {
+
+        $q = self::PREFIX_EX . ' ' .
+                self::PREFIX_OX . ' ' .
+                self::PREFIX_RDF . ' ' .
+                'SELECT DISTINCT *
+                    WHERE
+                    {
+                        ?feed rdf:type ex:FeedURI .
+                        ?concept rdf:type ex:Concept .
+                        ?concept  <http://www.example.org#hasName> ?name .
+                        ?concept  <http://www.example.org#hasConnectionToFeed> ?feed .
+                        
+                    } GROUP BY ?concept';
+
+        if ($errs = $this->arc_store->getErrors()) {
+            echo '{"response": [{ "function":"selectFeedQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
+            print_r($errs);
+        }
+
+        $feeds = array();
+        if ($rows = $this->arc_store->query($q, 'rows')) {
+
+            foreach ($rows as $row) {
+                if (isset($row['feed']))
+                    $feeds[$row['feed']]['uri'] = $row['feed'];
+                if (isset($row['concept'])) {
+                    if (!isset($feeds[$row['feed']]['concept'])) {
+                        $feeds[$row['feed']]['concept'] = array();
+                    }
+                    $feeds[$row['feed']]['concept'][] = $row['concept'];
+                }
+                /*  if(isset($row['concept']))
+                  $feeds[$row['concept']]['uri'] = $row['concept'];
+                  if(isset($row['name']))
+                  $feeds[$row['concept']]['name'] = $row['name'];
+                 */
+            }
+        } else {
+            echo '{"response": [{ status: 200, "function":"selectFeedQuery" ,"message":"No data returned"}]}';
+            print_r($errs);
+        }
+        echo("----------debug information----------");
+
+        return $feeds;
     }
 
-    public function similarityCheckWithCategories($term1, $term2) {
-
-        return $this->dbpedia_database->dbpediaSimilarityCheck($term1, $term2);
-    }
 
 }
 
