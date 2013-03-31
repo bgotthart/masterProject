@@ -24,11 +24,6 @@ class MainController {
      * and initiiates saving Keywords and Concepts in Database
 
      */
-
-    public function callSemanticApis($url) {
-        //    return $response;
-    }
-
     public function handlingAPIRequests($url) {
 
         $text = $this->getTextOfURL($url);
@@ -40,51 +35,55 @@ class MainController {
             array_push($keywords, $keyword['name']);
         }
 
-        return $this->DB_store->saveKeywordsToUserQuery($keywords);
+        return $this->DB_store->saveKeywordsToUserQuery($url, $keywords);
     }
 
     /*
      * return the output for the user interests
      */
 
-    public function printUserInterests() {
+    public function printTopUserInterests($version) {
+        //version 1 = only top 10 extracted Keywords
+        //version 2 = only main topics of dbpedia
+        //version 3 = top 10 ranked (counted) concepts
+        //version 4 = concepts with most connection from others
+        
+        if(count($this->userInterests) == 0){
+           $this->userInterests = $this->DB_store->selectTopUserInterests($version);
+        }
 
-        $this->userInterests = $this->DB_store->selectUserInterests();
+        return $this->userInterests;
 
-        $result = "<ul>";
+    }
+    
+    public function printAllUserInterests() {
+        $this->userInterests = $this->DB_store->selectAllUserInterests();
+
+        $HTMLResult = "<ul>";
 
         foreach ($this->userInterests as $topic) {
-            $result .= "<li>" . $topic['uri'];
+            $HTMLResult .= "<li>" . $topic['uri'];
             if(isset($topic['name']))
-            {
-                $result .= ", name: ".$topic['name'];
-                
-            }
-            if(isset($topic['count'])){
-                $result .= ", count: ". $topic['count'];
-            }
-            if(isset($topic['isKeyword'])){
-                $result .= ", isKeyword";
-            }
+                $HTMLResult .= ", name: ".$topic['name'];   
+            if(isset($topic['count']))
+                $HTMLResult .= ", count: ". $topic['count'];
+            if(isset($topic['isKeyword']))
+                $HTMLResult .= ", isKeyword";
             if (isset($topic['connection']))
-                $result .= ": " . $topic['connection']['uri'];
-            if (isset($topic['weight'])) {
-                $result .= ', weight: ' . $topic['weight'];
-            }
-
-
-            $result .= "</li>";
+                $HTMLResult .= ": " . $topic['connection']['uri'];
+            if (isset($topic['weight'])) 
+                $HTMLResult .= ', weight: ' . $topic['weight'];
+            $HTMLResult .= "</li>";
         }
-        $result .= "</ul>";
+        
+        $HTMLResult .= "</ul>";
 
-        return $result;
+        return $HTMLResult;
     }
 
     public function saveKeywords($keywords) {
 
         $extracted = explode(", ", $keywords);
-
-
         if (count($extracted) > 0 || strlen($extracted) > 0) {
 
             $extractedResponse = $this->DB_store->saveKeywordsToUserQuery($extracted);
@@ -94,22 +93,26 @@ class MainController {
 
         $response = json_decode($extractedResponse, true);
 
-
         if ($response['response'][0]['status'] == 400 || $response['response'][0]['status'] == '400') {
             return $extractedResponse;
         } else {
+            
             return json_encode($response['response'][0]);
         }
     }
 
-    public function getFeedsForUser() {
+    public function getFeedsForUser($version) {
         
         //Varianten:
         //1: 1. Ebene (Main Topics)
         //2: 1. + 2. Ebene 
         //3. nur  Keywords mit meister Häufigkeit
         //4: Verbindungen 
-        print_r($this->DB_store->selectFeedsForUser());
+        if(count($this->userInterests) == 0){
+           $this->userInterests = $this->DB_store->selectTopUserInterests($version);
+        }
+        
+        return $this->DB_store->selectFeedsForUser($this->userInterests);      
        
     }
     
@@ -129,9 +132,7 @@ class MainController {
 
             array_push($feeds, ((string) $feed->filename));
             echo $this->fetchFeedInformation((string) $feed->filename);
-        }
-        
-       
+        }   
     }
    
     /*
@@ -156,7 +157,8 @@ class MainController {
             
             //$response = $this->callOpenCalaisAPI($text);
 
- 
+            //! TODO !
+            //savingpubDate + description 
             $keywords = array();
             foreach ($response['keywords'] as $keyword) {
                 array_push($keywords, $keyword['name']);
@@ -212,6 +214,30 @@ class MainController {
         $x = new SimpleXmlElement($text);
 
         return (string) $x->text;
+    }
+    public function getContentScraping($url){
+                $config_xml = $this->loadConfigFile();
+
+        $apikey = (string) $config_xml->apis->alchemy->apikey;
+        $alchemyObj = new AlchemyAPI();
+        $alchemyObj->setAPIKey($apikey);
+
+        $title = $alchemyObj->URLGetTitle($url, AlchemyAPI::XML_OUTPUT_MODE);
+        $constraint = $alchemyObj->URLGetText($url, AlchemyAPI::XML_OUTPUT_MODE);
+        
+        $titleX = new SimpleXmlElement($title);
+        $constraintX = new SimpleXmlElement($constraint);
+        
+        $linkUrl = (string)$constraintX->url;
+        $title = (string)$titleX->title;
+        $text = (string)$constraintX->text;
+
+        $array =  array('url'=>$linkUrl, "title"=>$title, "text"=>$text);
+        
+        
+        return $array;
+       // $x = new SimpleXmlElement($text);
+
     }
 
     private function loadConfigFile() {
@@ -337,30 +363,33 @@ class MainController {
                 $this->printUserInterests();
 
     }
-
+    /*
+     *BACKUP 
     public function printAllUserInterests() {
-        $this->userInterests = $this->DB_store->selectAllQuery();
-        $result = "<ul>";
+        $this->userInterests = $this->DB_store->selectAllUserInterests();
+
+        $HTMLResult = "<ul>";
 
         foreach ($this->userInterests as $topic) {
-            $result .= "<li>" . $topic['name'] . ": " . $topic['weight'];
-
-            if (isset($topic['connections'])) {
-                $result .= "<ul> ";
-                foreach ($topic['connections'] as $connection) {
-                    $result .= "<li>" . $connection['connectionName'] . "</li> ";
-                    //$result .= $connection['connectionWeight']."</li>";
-                }
-                $result .= "</ul></li>";
-            } else {
-                $result .= "</li>";
-            }
+            $HTMLResult .= "<li>" . $topic['uri'];
+            if(isset($topic['name']))
+                $HTMLResult .= ", name: ".$topic['name'];   
+            if(isset($topic['count']))
+                $HTMLResult .= ", count: ". $topic['count'];
+            if(isset($topic['isKeyword']))
+                $HTMLResult .= ", isKeyword";
+            if (isset($topic['connection']))
+                $HTMLResult .= ": " . $topic['connection']['uri'];
+            if (isset($topic['weight'])) 
+                $HTMLResult .= ', weight: ' . $topic['weight'];
+            $HTMLResult .= "</li>";
         }
-        $result .= "</ul>";
+        
+        $HTMLResult .= "</ul>";
 
-        return $result;
+        return $HTMLResult;
     }
-
+     */
 
 }
 

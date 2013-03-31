@@ -22,149 +22,7 @@ require_once 'processAction.php';
         <script type="text/javascript">
             
             $(document).ready(function(){
-                $("#concepts_container").hide();
-                $("#keywords_container").hide();
-                
-                /*submit for keyword extraction*/
-                $("#addInterests").submit(function(e){
-                    $("#concepts_container").hide();
-                    $("#keywords_container").hide();
-                    e.preventDefault();
-                    
-                    $("body").prepend('<div id="loading"></div>');
-                   
-                    var data = $(this).serialize();
-                    
-                    var action = "http://localhost/~biancagotthart/masterProject/Project/processAction.php?call=callZemantaAPI&"+data;
-
-                    $.ajax({
-                        url: action
-                    }).done(function ( response ) {
-                        
-                    }).success(function (response){
-                        $("#loading").remove();
-                        
-                        console.log("keywords extraction successfully");
-                        
-                        console.log(response);
-                        var jsonObj = JSON.parse(response);
-                        
-                        var keywordsArray = new Array();
-                        var keywordsOutput = "";
-                        var lastElement = jsonObj.keywords[(jsonObj.keywords.length - 1)];
-                        
-                        for (var i = 0; i < jsonObj.keywords.length; i++) { 
-                            keywordsArray.push(jsonObj.keywords[i].name); 
-                            
-                            if(lastElement == jsonObj.keywords[i]){
-                                keywordsOutput += jsonObj.keywords[i].name;
-                            }else{
-                                keywordsOutput += jsonObj.keywords[i].name + ", ";
-
-                            }
-                        }
-                        
-
-                        $("#keywords").html(keywordsOutput);
-                        $("#keywords_container").show();
-                        $("#term").val(keywordsOutput);
-                        var keywordsHiddenField = "<input id='input_keywords' type='hidden' name='keywords' value='"+keywordsOutput+"'/>";
-
-                        $("#conceptsOfDBpedia").append(keywordsOutput);
-                        
-                    }).error(function ( jqXHR, textStatus, errorThrown){
-                        console.log("error in keyword extraction");
-                        
-                        $("#loading").remove();
-                    });
-                      
-                });
-                
-                /*submit for concept extraction of dbpedia*/
-                $("#conceptsOfDBpedia").submit(function(e){
-                    $("#concepts_container").hide();
-                    $("#keywords_container").hide();
-                    e.preventDefault();
-                   
-                    $("body").prepend('<div id="loading"></div>');
-                    var data = $(this).serialize();
-                   
-                    console.log(this);
-                    console.log(data);
-                    var action = "http://localhost/~biancagotthart/masterProject/Project/processAction.php?saveKeywords="+data;
-
-                    console.log(action);
-                    $.ajax({
-                        url: action
-                    }).done(function ( response ) {
-                        
-                    }).success(function (response){
-                        $("#loading").remove();
-                        console.log("concept extraction successfully");
-                        console.log(response);
-                        
-                    }).error(function ( jqXHR, textStatus, errorThrown){
-                        console.log("error in concept extraction");
-                    });
-                      
-                });
-                
-                $("#addTerm").submit(function(e){
-                    $("#concepts_container").hide();
-                    $("#keywords_container").hide();
-                    e.preventDefault();
-                   
-                    $("body").prepend('<div id="loading"></div>');
-                   
-                    var data = $(this).serialize();
-                    
-                    var term = (data.split("term="))[1];
-                    var action = "http://localhost/~biancagotthart/masterProject/Project/processAction.php?saveKeywords=" + term;
-
-                    console.log(action);
-                    
-                    $.ajax({
-                        url: action
-                    }).done(function ( response ) {
-                        
-                    }).success(function (response){
-                        $("#loading").remove();
-                        
-                        console.log("concept extraction successfully");
-                        var jsonObj = JSON.parse(response);
-                        var keywordsArray = new Array();
-                        var keywordsOutput = "<p>";
-                        
-                        
-                        
-                        for (var key in jsonObj.results[0]) {
-                            keywordsArray[key] = new Array();
-                            keywordsOutput += key + ": ";
-                                
-                            var lastElement = jsonObj.results[0][key][(jsonObj.results[0][key].length - 1)];
-
-
-                            for (var i = 0; i < jsonObj.results[0][key].length; i++) {
-                                keywordsArray[key].push(jsonObj.results[0][key][i].name); 
-                                    
-                                if(lastElement == jsonObj.results[0][key][i]){
-                                    keywordsOutput += jsonObj.results[0][key][i].name;
-                                }else{
-                                    keywordsOutput += jsonObj.results[0][key][i].name + ", ";
-
-                                }
-                            }
-                            keywordsOutput += "<br>";
-                        }
-                        keywordsOutput += "</p>";
-                       
-                        $("#concepts").html(keywordsOutput);
-                        $("#concepts_container").show();
-                        
-                    })
-                });
-                    
-
+                           
             });
 
 
@@ -172,20 +30,65 @@ require_once 'processAction.php';
     </head>
     <body>
         <div id="left_content">
-            <h1>Demo </h1>
 
-            <h1>Interests of Bianca Gotthart</h1>
+            <h1>News Feed</h1>
             <?php
-            echo processAction_printFeedsForUser();
+                $feeds = processAction_printFeedsForUser();
+
+                foreach ($feeds as $feed) {
+                    echo "<div class='feeditem'>";
+                    
+                    /*******print headline + content*******/
+                    $textArray = processAction_printTextOfURL($feed['url']);
+                    echo "<h2>". $textArray['title'] . "</h2>";
+                    echo "<p>". $textArray['text'] . "</p>";
+                    
+                    /*******print link*******/                   
+                    echo "<p><a href='";
+                    echo "'>".$textArray['url']."</a></p>";
+
+                    /*******print saved concepts*******/
+                    if(isset($feed['concept'])){
+                        //print_r($feed['concept']);
+                        $last = end($feed['concept']);
+                        echo "<p>";
+                        foreach($feed['concept'] as $concept){
+                            echo " ".$concept['name'];
+                            if($last != $concept){
+                                echo ", ";
+                            }
+                        }
+                        echo ("</p>");
+                    }
+                        
+                     echo "</div>";
+
+                }
+
+                
             ?>
         </div>
 
         <div id="right_content">
             <div id="interests">
 
-                <h1>Interests of Bianca Gotthart</h1>
+                <h1>Interests</h1>
                 <?php
-                echo processAction_printInterests();
+                    $userInterests = processAction_printInterests();
+                    
+                    echo "<ul>";
+
+                    foreach ($userInterests as $topic) {
+                        echo "<li>";
+                        if(isset($topic['name']))
+                            echo $topic['name'];   
+                        if(isset($topic['count']))
+                            echo " (count: ". $topic['count'].")";
+                        echo "</li>";
+                    }
+
+                    echo "</ul>";
+
                 ?>
             </div>
         </div>

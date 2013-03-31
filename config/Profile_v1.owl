@@ -85,6 +85,12 @@
     
 
 
+    <!-- http://www.example.org#hasDescription -->
+
+    <owl:ObjectProperty rdf:about="&www;hasDescription"/>
+    
+
+
     <!-- http://www.example.org#hasInterest -->
 
     <owl:ObjectProperty rdf:about="&www;hasInterest"/>
@@ -97,21 +103,25 @@
     
 
 
+    <!-- http://www.example.org#hasPubDate -->
+
+    <owl:ObjectProperty rdf:about="&www;hasPubDate"/>
+    
+
+
+    <!-- http://www.example.org#hasRead -->
+
+    <owl:ObjectProperty rdf:about="&www;hasRead">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.example.org#isConnectedWith -->
 
     <owl:ObjectProperty rdf:about="&www;isConnectedWith">
         <rdf:type rdf:resource="&owl;TransitiveProperty"/>
         <owl:inverseOf rdf:resource="&www;hasConnectionTo"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://www.example.org#isInterestedBy -->
-
-    <owl:ObjectProperty rdf:about="&www;isInterestedBy">
-        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
-        <rdfs:domain rdf:resource="&www;Concept"/>
-        <rdfs:range rdf:resource="&www;User"/>
     </owl:ObjectProperty>
     
 

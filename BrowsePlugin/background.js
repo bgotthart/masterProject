@@ -10,9 +10,13 @@ function sendRequest(url){
              if (xhr.status == 200){
 
                  var jsonResponse = xhr.responseText;
+                 console.log("Saving concepts successfully done!");
+                    //console.log(jsonResponse);
 
              }else{
                  var jsonResponse = xhr.response;
+                 console.log("resposne 2");
+                 console.log(jsonResponse.response[0].message);
                  
                 chrome.browserAction.setBadgeText ( {
                      text: "ERR"
@@ -23,7 +27,9 @@ function sendRequest(url){
                      } );
                  }, 2000);
              }
-         }        
+         }  else{
+             
+         }      
      }; 
      if(url.substring(0,4) != "http"){
          url += "http://" + url;

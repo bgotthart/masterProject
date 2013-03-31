@@ -89,8 +89,6 @@ require_once 'processAction.php';
                     $("body").prepend('<div id="loading"></div>');
                     var data = $(this).serialize();
                    
-                    console.log(this);
-                    console.log(data);
                     var action = "http://localhost/~biancagotthart/masterProject/Project/processAction.php?saveKeywords="+data;
 
                     console.log(action);
@@ -99,6 +97,8 @@ require_once 'processAction.php';
                     }).done(function ( response ) {
                         
                     }).success(function (response){
+                        
+                        console.log(response);
                         $("#loading").remove();
                         console.log("concept extraction successfully");
                         console.log(response);
@@ -120,14 +120,13 @@ require_once 'processAction.php';
                     
                     var term = (data.split("term="))[1];
                     var action = "http://localhost/~biancagotthart/masterProject/Project/processAction.php?saveKeywords=" + term;
-
-                    console.log(action);
                     
                     $.ajax({
                         url: action
                     }).done(function ( response ) {
                         
                     }).success(function (response){
+                        console.log(response);
                         $("#loading").remove();
                         
                         console.log("concept extraction successfully");
@@ -212,9 +211,21 @@ require_once 'processAction.php';
                 
                     <h1>Interests of Bianca Gotthart</h1>
                     <?php
-
-                    echo processAction_printInterests();
+                    $userInterests = processAction_printInterests();
                     
+                    echo "<ul>";
+
+                    foreach ($userInterests as $topic) {
+                        echo "<li>";
+                        if(isset($topic['name']))
+                            echo $topic['name'];   
+                        if(isset($topic['count']))
+                            echo " (count: ". $topic['count'].")";
+                        echo "</li>";
+                    }
+
+                    echo "</ul>";
+
                     ?>
             </div>
         </div>

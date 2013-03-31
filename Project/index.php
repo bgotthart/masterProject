@@ -33,7 +33,6 @@ require_once 'processAction.php';
         <div>
             <h1>Interests of Bianca Gotthart</h1>
                 <?php
-
                 echo processAction_printInterests();
                 ?>
             

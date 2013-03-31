@@ -45,16 +45,31 @@ function processAction_addInterestText($text) {
 }
 
 function processAction_printInterests() {
-    return $_SESSION['controller']->printUserInterests();
+    if(isset($_GET['version'])){
+        $version = $_GET['version'];
+    }else{
+        $version = 1;
+    }
+    
+    return $_SESSION['controller']->printTopUserInterests($version);
 }
 function processAction_printFeedsForUser() {
-    return ($_SESSION['controller']->getFeedsForUser() );
+    if(isset($_GET['version'])){
+        $version = $_GET['version'];
+    }else{
+        $version = 1;
+    }
+    return ($_SESSION['controller']->getFeedsForUser($version) );
 }
 
+function processAction_printTextOfURL($url){
+    return ($_SESSION['controller']->getContentScraping($url));
+
+}
 /*debug*/
 
 function processAction_printAllFeeds() {
-    return ($_SESSION['controller']->getFeeds() );
+    return ($_SESSION['controller']->getAllFeeds() );
 }
 
 if(isset($_GET['getFeeds'])){
