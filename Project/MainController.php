@@ -118,7 +118,15 @@ class MainController {
     
      public function getAllFeeds() {
         
-        print_r($this->DB_store->selectAllFeedQuery());
+        $feeds = $this->DB_store->selectAllFeedQuery();
+        echo "<ul>";
+        foreach($feeds as $feed){
+            echo "<li>".$feed['uri'];
+           // print_r($feed['concept']);
+            echo "</li>";
+        }
+        echo "</ul>";
+        //return $result;
        
     }
     public function saveFeeds() {

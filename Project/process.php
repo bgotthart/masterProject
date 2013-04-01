@@ -137,23 +137,23 @@ require_once 'processAction.php';
                         
                         
                         for (var key in jsonObj.results[0]) {
-                                keywordsArray[key] = new Array();
-                                keywordsOutput += key + ": ";
+                            keywordsArray[key] = new Array();
+                            keywordsOutput += key + ": ";
                                 
-                                var lastElement = jsonObj.results[0][key][(jsonObj.results[0][key].length - 1)];
+                            var lastElement = jsonObj.results[0][key][(jsonObj.results[0][key].length - 1)];
 
 
-                                for (var i = 0; i < jsonObj.results[0][key].length; i++) {
-                                    keywordsArray[key].push(jsonObj.results[0][key][i].name); 
+                            for (var i = 0; i < jsonObj.results[0][key].length; i++) {
+                                keywordsArray[key].push(jsonObj.results[0][key][i].name); 
                                     
-                                    if(lastElement == jsonObj.results[0][key][i]){
-                                        keywordsOutput += jsonObj.results[0][key][i].name;
-                                    }else{
-                                        keywordsOutput += jsonObj.results[0][key][i].name + ", ";
+                                if(lastElement == jsonObj.results[0][key][i]){
+                                    keywordsOutput += jsonObj.results[0][key][i].name;
+                                }else{
+                                    keywordsOutput += jsonObj.results[0][key][i].name + ", ";
 
-                                    }
                                 }
-                                keywordsOutput += "<br>";
+                            }
+                            keywordsOutput += "<br>";
                         }
                         keywordsOutput += "</p>";
                        
@@ -170,63 +170,65 @@ require_once 'processAction.php';
         </script>
     </head>
     <body>
-        <div id="left_content">
-            <div id="form">
-                <h1>Demo </h1>
+        <div id="container">
 
-                <form action="processAction.php" method="post" id="addInterests">
-                    <label for="url">URL: </label> <input id="url" type="text" value="http://derstandard.at/1356427111455/Die-hotVolleys-sind-keine-Amateure-mehr" name="url" size="100"/>
+            <div id="left_content">
+                <div id="form">
+                    <h1>Demo </h1>
 
-                    <input type="hidden" value="test" />
-                    <input type="submit" value="Start Analyse" />
-                </form>
+                    <form action="processAction.php" method="post" id="addInterests">
+                        <label for="url">URL: </label> <input id="url" type="text" value="http://derstandard.at/1356427111455/Die-hotVolleys-sind-keine-Amateure-mehr" name="url" size="100"/>
 
-                <form action="processAction.php" method="post" id="addTerm">
-                    <label for="term">Term: </label> <input id="term" type="text" value="" name="term" size="100"/>
+                        <input type="hidden" value="test" />
+                        <input type="submit" value="Start Analyse" />
+                    </form>
 
-                    <input type="hidden" value="test" />
-                    <input type="submit" value="Start DBpedia Analyse" />
-                </form>
-            </div>
+                    <form action="processAction.php" method="post" id="addTerm">
+                        <label for="term">Term: </label> <input id="term" type="text" value="" name="term" size="100"/>
 
-            <div id="keywords_container">
-                <h2>Extracted Keywords by Zemanta</h2>
-                <div id="keywords">
-
+                        <input type="hidden" value="test" />
+                        <input type="submit" value="Start DBpedia Analyse" />
+                    </form>
                 </div>
-                <!--<form action="processAction.php" method="post" id="conceptsOfDBpedia">
-                    <input type="submit" value="Get concepts of DBpedia" />
-                </form>-->
+
+                <div id="keywords_container">
+                    <h2>Extracted Keywords by Zemanta</h2>
+                    <div id="keywords">
+
+                    </div>
+                    <!--<form action="processAction.php" method="post" id="conceptsOfDBpedia">
+                        <input type="submit" value="Get concepts of DBpedia" />
+                    </form>-->
+                </div>
+
+
+                <div id="concepts_container">
+                    <h2>Extracted Concepts from DBpedia</h2>
+                    <div id="concepts"></div>
+                </div>
             </div>
 
+            <div id="right_content">
+                <div id="interests">
 
-            <div id="concepts_container">
-                <h2>Extracted Concepts from DBpedia</h2>
-                <div id="concepts"></div>
-            </div>
-        </div>
-
-        <div id="right_content">
-            <div id="interests">
-                
                     <h1>Interests of Bianca Gotthart</h1>
                     <?php
                     $userInterests = processAction_printInterests();
-                    
+
                     echo "<ul>";
 
                     foreach ($userInterests as $topic) {
                         echo "<li>";
-                        if(isset($topic['name']))
-                            echo $topic['name'];   
-                        if(isset($topic['count']))
-                            echo " (count: ". $topic['count'].")";
+                        if (isset($topic['name']))
+                            echo $topic['name'];
+                        if (isset($topic['count']))
+                            echo " (count: " . $topic['count'] . ")";
                         echo "</li>";
                     }
 
                     echo "</ul>";
-
                     ?>
+                </div>
             </div>
         </div>
     </body>

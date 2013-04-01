@@ -1,15 +1,71 @@
-/* 
-    Document   : styles
-    Created on : Feb 7, 2013, 3:54:20 PM
-    Author     : biancagotthart
-    Description:
-        Purpose of the stylesheet follows.
-*/
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+}
+html, body{
+}
+html {
+    font-size: 62.5%;
+}
+body {
+    font-size: 100%;
+    position: relative;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /*background: #444444 url(img/bg.jpg) repeat fixed;*/
+    font-family: "Helvetica Neue", Helvetica, Jamrul, sans-serif;
+    text-align: center;
+    color:#333;
 
+}
 root { 
     display: block;
 }
 
+a:hover {
+    text-decoration: underline;
+}
+ol, ul {
+    list-style: none;
+}
+p, ul, ol {
+    margin-bottom: 0.6em;
+}
+p, li {
+    line-height: 1.3em;
+    font-size: 1.3em;
+    text-align:left;
+}
+h1{
+    font-size:2em;
+    margin-bottom:1em;
+}
+h2{
+    font-size:1.8em;
+    margin-bottom:1em;
+}
+p a {
+    font-size: 1em;
+    line-height: 1em;
+}
+
+#container{
+    height: auto !important;
+
+    margin: 0 auto;
+    position: relative;
+    width: 100em;
+    text-align: left;
+    margin-top:2em;
+}
+
+.content-container{
+    margin-bottom: 2em;
+    border-bottom:0.1em solid #333;
+    
+}
 #loading{
     background:url(images/ajax-loader.gif) no-repeat top left;
     position:absolute;
@@ -17,18 +73,27 @@ root {
     left:50%;
     width:100px;
     height:100px;
-    
+
 }
 
 #left_content{
     float:left;
-    width:50%;
+    width:65%;
+    
 }
 #right_content{
     float:right;
-    width:50%;
+    width:30%;
 }
 
 form{
-    margin:40px; 0;
+    margin:40px 0;
+}
+
+.feeditem{
+
+}
+.item-concepts span{
+    font-size:1.1em;
+    font-style: italic;
 }

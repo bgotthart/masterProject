@@ -1,3 +1,112 @@
+public function selectFeedsForUser($concepts) {
+
+        $q = self::PREFIX_EX . ' ' .
+                self::PREFIX_OX . ' ' .
+                self::PREFIX_RDF . ' ' .
+                'SELECT DISTINCT *
+                    WHERE
+                    {
+                        ?feed rdf:type ex:FeedURI .
+                        ?concept rdf:type ex:Concept .
+                        ?concept ex:hasName ?name .
+                        ?concept ex:hasConnectionToFeed ?feed . ';
+
+
+        $last = end($concepts);
+        $q .= ' FILTER (';
+        foreach ($concepts as $concept) {
+            $q .= ' ?name = "' . $concept['name'] . '"';
+            if ($last['name'] == $concept['name']) {
+                $q .= ' ) ';
+            } else {
+                $q .= ' || ';
+            }
+        }
+//for subquery:  GROUP BY ?feed ORDER BY DESC(xsd:integer(?count))
+        $q .= '}  LIMIT 25';
+
+        /*
+          (COUNT(?connection) as ?weight)
+          ORDER BY DESC(xsd:integer(?weight))
+         */
+
+        if ($errs = $this->arc_store->getErrors()) {
+            print_r($errs);
+            return '{"response": [{ "function":"selectFeedQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
+        }
+
+        $feeds = array();
+        if ($rows = $this->arc_store->query($q, 'rows')) {
+
+            foreach ($rows as $row) {
+  /*               $subQ = self::PREFIX_EX . ' ' .
+                        self::PREFIX_OX . ' ' .
+                        self::PREFIX_RDF . ' ' .
+                        'SELECT DISTINCT *
+                        WHERE
+                        {
+                            ?concept2 rdf:type ex:Concept .
+                            ?concept2 ex:hasName ?name2 .
+                            ?concept2 ex:hasConnectionWeight ?weight .
+                            ?concept2 ex:hasConnectionToFeed <'. $row['feed'].'> . 
+                                
+                        } GROUP BY ?concept2 ORDER BY DESC(xsd:integer(?weight)) LIMIT 25';
+
+                if ($subErrs = $this->arc_store->getErrors()) {
+                    print_r($subErrs);
+                    return '{"response": [{ "function":"selectFeedQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
+                }
+               $concepts = array();
+ 
+                if ($subRows = $this->arc_store->query($subQ, 'rows')) {
+                    
+                    foreach ($subRows as $subRow) {
+                        $concept = array();
+                        $concept['uri'] = $subRow['concept2'];
+                        $concept['name'] = $subRow['name2'];
+                        if(!in_array($concept, $concepts))
+                        {
+                            $concepts[] = $concept;
+                           // $feeds[$row['feed']]['concept'][] = $concepts;
+                        }
+                        
+                    }
+                    
+                }
+ * 
+ */
+                
+                if (isset($feeds[$row['feed']])) {
+                    
+                    
+                    //solution for suquery
+                    //$feeds[$row['feed']]['concept'] = $concepts;
+                    
+                    $concept['uri'] = $row['concept'];
+                    $concept['name'] = $row['name'];
+                    if(!in_array($concept, $feeds[$row['feed']]['concept']))
+                        $feeds[$row['feed']]['concept'][] = $concept;
+                } else {
+                    $feeds[$row['feed']]['url'] = $row['feed'];
+                    $feeds[$row['feed']]['concept'] = array();
+                }
+                 
+                //solution for subquery
+                //$feeds[$row['feed']]['url'] = $row['feed'];
+                //$feeds[$row['feed']]['concept'] = $concepts;
+                
+            }
+        } else {
+            echo '{"response": [{ status: 200, "function":"selectFeedQuery" ,"message":"No data returned"}]}';
+            print_r($errs);
+        }
+
+        return $feeds;
+    }
+
+
+
+
 //disambiguation
 private function lookForDBpediaTerm($term) {
         $term = $this->prepareTermNameForDBpedia($term);

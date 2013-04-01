@@ -29,36 +29,38 @@ require_once 'processAction.php';
         </script>
     </head>
     <body>
-        <div id="left_content">
+        <div id="container">
+            <div id="left_content">
 
             <h1>News Feed</h1>
             <?php
                 $feeds = processAction_printFeedsForUser();
 
                 foreach ($feeds as $feed) {
-                    echo "<div class='feeditem'>";
+                    echo "<div class='feeditem content-container'>";
                     
                     /*******print headline + content*******/
-                    $textArray = processAction_printTextOfURL($feed['url']);
+                    /*$textArray = processAction_printTextOfURL($feed['url']);
                     echo "<h2>". $textArray['title'] . "</h2>";
-                    echo "<p>". $textArray['text'] . "</p>";
-                    
+                    echo "<p>". substr($textArray['text'], 0, 50). "...</p>";
+                    */
                     /*******print link*******/                   
-                    echo "<p><a href='";
-                    echo "'>".$textArray['url']."</a></p>";
+                    echo '<p class="item-link">';
+                    //echo "'>".$textArray['url']."</a></p>";
+                    echo '<a href="'.$feed['url'].'">'.$feed['url'].'</a></p>';
 
                     /*******print saved concepts*******/
                     if(isset($feed['concept'])){
                         //print_r($feed['concept']);
                         $last = end($feed['concept']);
-                        echo "<p>";
+                        echo "<div class='item-concepts'><span>Linked Concepts: ";
                         foreach($feed['concept'] as $concept){
-                            echo " ".$concept['name'];
+                            echo $concept['name'];
                             if($last != $concept){
                                 echo ", ";
                             }
                         }
-                        echo ("</p>");
+                        echo ("</span></div>");
                     }
                         
                      echo "</div>";
@@ -92,5 +94,6 @@ require_once 'processAction.php';
                 ?>
             </div>
         </div>
+            </div>
     </body>
 </html>

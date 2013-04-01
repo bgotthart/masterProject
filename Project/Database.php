@@ -400,22 +400,24 @@ class DatabaseClass {
                         ?feed rdf:type ex:FeedURI .
                         ?concept rdf:type ex:Concept .
                         ?concept ex:hasName ?name .
-                        ?concept ex:hasConnectionWeight ?weight .
-                        ?concept ex:hasConnectionToFeed ?feed . ';
+                        ?concept ex:hasConnectionToFeed ?feed . 
+                        
+                        FILTER (';
 
-        $last = end($concepts);
-        $q .= ' FILTER (';
-        foreach ($concepts as $concept) {
-            $q .= ' ?name = "' . $concept['name'] . '"';
-            if ($last['name'] == $concept['name']) {
-                $q .= ' ) ';
-            } else {
-                $q .= ' || ';
-            }
-        }
-        
-        $q .= '} LIMIT 10 ';
+                        $last = end($concepts);
+                        foreach ($concepts as $concept) {
+                            
+                            $q .= ' ?concept = <' . $concept['concept'] . '>';
+                            
+                            if ($last['concept'] == $concept['concept']) {
+                                $q .= ' ) ';
+                            } else {
+                                $q .= ' || ';
+                            }
+                        }
+                        $q .= '}  LIMIT 25';
 
+    
         if ($errs = $this->arc_store->getErrors()) {
             print_r($errs);
             return '{"response": [{ "function":"selectFeedQuery" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
@@ -425,16 +427,24 @@ class DatabaseClass {
         if ($rows = $this->arc_store->query($q, 'rows')) {
 
             foreach ($rows as $row) {
-                $feeds[$row['feed']]['url'] = $row['feed'];
                 $concept['uri'] = $row['concept'];
                 $concept['name'] = $row['name'];
-                $feeds[$row['feed']]['concept'][] = $concept;
+                if (isset($feeds[$row['feed']])) {  
+                    
+                    if(!in_array($concept, $feeds[$row['feed']]['concept']))
+                        $feeds[$row['feed']]['concept'][] = $concept;
+                } else {
+                    $feeds[$row['feed']]['url'] = $row['feed'];
+                    $feeds[$row['feed']]['concept'] = array();
+                    $feeds[$row['feed']]['concept'][] = $concept;
+                }
+                                
             }
         } else {
             echo '{"response": [{ status: 200, "function":"selectFeedQuery" ,"message":"No data returned"}]}';
             print_r($errs);
         }
-       
+
         return $feeds;
     }
 
@@ -442,13 +452,15 @@ class DatabaseClass {
 
         switch ($version) {
             case 1:
-                return $this->getKeywordsOfUser();
+                return $this->getTopRankedConcepts();
+
                 break;
             case 2:
                 return $this->getMainTopicsOfUser();
                 break;
             case 3:
-                return $this->getTopRankedConcepts();
+                return $this->getKeywordsOfUser();
+
                 break;
             default:
                 break;
@@ -554,7 +566,8 @@ class DatabaseClass {
                         ?concept rdf:type ex:Concept .
                         ?concept ex:hasName ?name .
                         ?concept ex:hasCount ?count .
-                    } GROUP BY ?concept ORDER BY DESC(xsd:integer(?count)) LIMIT 40';
+                    } GROUP BY ?concept ORDER BY DESC(xsd:integer(?count)) LIMIT 20';
+
         if ($errs = $this->arc_store->getErrors()) {
             echo '{"response": [{ "function":"selectQueryTopRankedConcepts" ,"message":"Error in SELECT", "error:"' . $errs . '}]}';
             print_r($errs);
@@ -603,7 +616,7 @@ class DatabaseClass {
 
                 $mainTopic = array();
                 $mainTopic['name'] = $row['name'];
-                $mainTopic['topic'] = $row['topic'];
+                $mainTopic['concept'] = $row['topic'];
                 $mainTopic['count'] = $row['count'];
                 array_push($mainTopics, $mainTopic);
             }
@@ -629,7 +642,7 @@ class DatabaseClass {
                             ?concept  <http://www.example.org#hasCount> ?count .
 
                         }
-                    } GROUP BY ?concept ORDER BY DESC(xsd:integer(?count)) LIMIT 25';
+                    } GROUP BY ?concept ORDER BY DESC(xsd:integer(?count)) ';
 
 
         if ($errs = $this->arc_store->getErrors()) {
@@ -647,8 +660,9 @@ class DatabaseClass {
                 $concept = array();
                 $concept['concept'] = $row['concept'];
                 $concept['name'] = $row['name'];
-                $concept['count'] = $row['count'];
-
+                if (isset($row['count'])) {
+                    $concept['count'] = $row['count'];
+                }
                 array_push($concepts, $concept);
             }
         } else {

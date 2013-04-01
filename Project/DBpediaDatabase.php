@@ -401,7 +401,7 @@ class DBpedia_DatabaseClass extends DatabaseClass {
     }
 
     private function get3LevelCategories($term, $level) {
-
+//set_time_limit(0);
         try {
             if ($level == 1) {
                 $select = 'SELECT DISTINCT * WHERE {
